@@ -439,15 +439,16 @@ install -m 644 -p $RPM_SOURCE_DIR/10-listen443.conf \
       $RPM_BUILD_ROOT%{_unitdir}/httpd.socket.d/10-listen443.conf
 %endif
 
-%if 0%{?rhel} < 7
-# el6 should use /var/run, not /run
-sed -i '/^SSLSessionCache/s,/run,%{_rundir},' ssl.conf
-%endif
-
 for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
+
+%if 0%{?rhel} < 7
+# el6 should use /var/run, not /run
+sed -i '/^SSLSessionCache/s,/run,%{_rundir},' \
+    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/ssl.conf
+%endif
 
 # Split-out extra config shipped as default in conf.d:
 for f in autoindex; do
