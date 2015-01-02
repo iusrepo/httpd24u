@@ -1,9 +1,36 @@
+%global real_name httpd
+%global ius_suffix 24u
+
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
 %define suexec_caller apache
 %define mmn 20120211
+%define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
+
+%if 0%{?fedora}
 %define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
+%else
+%if 0%{?centos}
+%define vstring CentOS
+%else
+%define vstring Red Hat
+%endif # centos
+%endif # fedora
+
+%if 0%{?rhel} >= 7
+%global with_systemd 1
+%global _macrosdir %{_rpmconfigdir}/macros.d
+%global _rundir /run
+%global suexec_uidmin 1000
+%global suexec_gidmin 1000
+%else
+%global with_systemd 0
+%global _macrosdir %{_sysconfdir}/rpm
+%global _rundir %{_localstatedir}/run
+%global suexec_uidmin 500
+%global suexec_gidmin 100
+%endif
 
 # Drop automatic provides for module DSOs
 %{?filter_setup:
@@ -12,9 +39,9 @@
 }
 
 Summary: Apache HTTP Server
-Name: httpd
+Name: %{real_name}%{ius_suffix}
 Version: 2.4.10
-Release: 15%{?dist}
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -25,6 +52,7 @@ Source5: httpd.tmpfiles
 Source6: httpd.service
 Source7: action-graceful.sh
 Source8: action-configtest.sh
+Source9: httpd.init
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -49,6 +77,7 @@ Source30: README.confd
 Source31: README.confmod
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
+Source42: htcacheclean.init
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
@@ -67,7 +96,6 @@ Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.6-sslmultiproxy.patch
 Patch34: httpd-2.4.9-socket-activation.patch
-Patch35: httpd-2.4.10-sslciphdefault.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
@@ -79,34 +107,54 @@ Patch102: httpd-2.4.10-CVE-2014-3583.patch
 Patch103: httpd-2.4.10-CVE-2014-8109.patch
 License: ASL 2.0
 Group: System Environment/Daemons
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
+%if 0%{?with_systemd}
 BuildRequires: systemd-devel
-Requires: /etc/mime.types, system-logos-httpd
+%endif
+Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
+Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
 Requires(pre): httpd-filesystem
+%if 0%{?with_systemd}
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
+%else
+Requires: initscripts >= 8.36
+Requires(post): chkconfig
+%endif
 Conflicts: apr < 1.5.0-1
+
+# IUS-isms
+Provides: %{real_name} = %{version}-%{release}
+Provides: %{real_name}%{?_isa} = %{version}-%{release}
+# not sure on this one, it is provided by the stock el6 package but not the
+# el7 or fedora ones
+#Provides: config(%{real_name}) = %{version}-%{release}
+Conflicts: %{real_name} < %{version}
+
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
 web server.
 
+
 %package devel
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel, apr-util-devel, pkgconfig
+Requires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pkgconfig
 Requires: httpd = %{version}-%{release}
+# IUS-isms
+Provides: %{real_name}-devel = %{version}-%{release}
+Provides: %{real_name}-devel%{?_isa} = %{version}-%{release}
+Conflicts: %{real_name}-devel < %{version}
 
 %description devel
 The httpd-devel package contains the APXS binary and other files
@@ -117,105 +165,143 @@ If you are installing the Apache HTTP server and you want to be
 able to compile or develop additional modules for Apache, you need
 to install this package.
 
+
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server
 Requires: httpd = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 BuildArch: noarch
+# IUS-isms
+Provides: %{real_name}-manual = %{version}-%{release}
+Provides: %{real_name}-manual%{?_isa} = %{version}-%{release}
+Conflicts: %{real_name}-manual < %{version}
 
 %description manual
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.2/.
 
+
 %package filesystem
 Group: System Environment/Daemons
 Summary: The basic directory layout for the Apache HTTP server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
+# IUS-isms
+Provides: %{real_name}-filesystem = %{version}-%{release}
+Provides: %{real_name}-filesystem%{?_isa} = %{version}-%{release}
+Conflicts: %{real_name}-filesystem < %{version}
 
 %description filesystem
 The httpd-filesystem package contains the basic directory layout
 for the Apache HTTP server including the correct permissions
 for the directories.
 
+
 %package tools
 Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
+# IUS-isms
+Provides: %{real_name}-tools = %{version}-%{release}
+Provides: %{real_name}-tools%{?_isa} = %{version}-%{release}
+Conflicts: %{real_name}-tools < %{version}
 
 %description tools
 The httpd-tools package contains tools which can be used with 
 the Apache HTTP Server.
 
-%package -n mod_ssl
+
+%package -n mod%{ius_suffix}_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat, hostname
+Requires(post): openssl >= 0.9.7f-4, /bin/cat, hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
-# Require an OpenSSL which supports PROFILE=SYSTEM
-Conflicts: openssl-libs < 1:1.0.1h-4
+# IUS-isms
+Provides: mod_ssl = %{version}-%{release}
+Provides: mod_ssl%{?_isa} = %{version}-%{release}
+Conflicts: mod_ssl < %{version}
 
-%description -n mod_ssl
+%description -n mod%{ius_suffix}_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
-%package -n mod_proxy_html
+
+%package -n mod%{ius_suffix}_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
 Epoch: 1
-Obsoletes: mod_proxy_html < 1:2.4.1-2
+# IUS-isms
+Provides: mod_proxy_html = %{version}-%{release}
+Provides: mod_proxy_html%{?_isa} = %{version}-%{release}
+Conflicts: mod_proxy_html < %{version}
 
-%description -n mod_proxy_html
+%description -n mod%{ius_suffix}_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
-%package -n mod_ldap
+
+%package -n mod%{ius_suffix}_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: apr-util-ldap
+Requires: apr-util-ldap >= 1.5.0
+# IUS-isms
+Provides: mod_ldap = %{version}-%{release}
+Provides: mod_ldap%{?_isa} = %{version}-%{release}
+Conflicts: mod_ldap < %{version}
 
-%description -n mod_ldap
+%description -n mod%{ius_suffix}_ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
-%package -n mod_session
+
+%package -n mod%{ius_suffix}_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+# IUS-isms
+Provides: mod_session = %{version}-%{release}
+Provides: mod_session%{?_isa} = %{version}-%{release}
+Conflicts: mod_session < %{version}
 
-%description -n mod_session
+%description -n mod%{ius_suffix}_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
+
 %prep
-%setup -q
+%setup -q -n %{real_name}-%{version}
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
 %patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
 
+%if 0%{?with_systemd}
 %patch19 -p1 -b .detectsystemd
+%endif
 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
+%if 0%{?with_systemd}
 %patch29 -p1 -b .systemd
+%endif
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
+%if 0%{?with_systemd}
 %patch34 -p1 -b .socketactivation
-%patch35 -p1 -b .sslciphdefault
+%endif
 
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
@@ -280,9 +366,9 @@ export LYNX_PATH=/usr/bin/links
 	--with-suexec-caller=%{suexec_caller} \
 	--with-suexec-docroot=%{docroot} \
 	--without-suexec-logfile \
-        --with-suexec-syslog \
+	--with-suexec-syslog \
 	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=1000 --with-suexec-gidmin=1000 \
+	--with-suexec-uidmin=%{suexec_uidmin} --with-suexec-gidmin=%{suexec_gidmin} \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -297,17 +383,25 @@ export LYNX_PATH=/usr/bin/links
 	$*
 make %{?_smp_mflags}
 
-%install
-rm -rf $RPM_BUILD_ROOT
 
+%install
 make DESTDIR=$RPM_BUILD_ROOT install
 
+%if 0%{?with_systemd}
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 for s in httpd.service htcacheclean.service httpd.socket; do
   install -p -m 644 $RPM_SOURCE_DIR/${s} \
                     $RPM_BUILD_ROOT%{_unitdir}/${s}
 done
+%else
+# install SYSV init stuff
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -m755 $RPM_SOURCE_DIR/httpd.init \
+	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+install -m755 $RPM_SOURCE_DIR/htcacheclean.init \
+	$RPM_BUILD_ROOT/etc/rc.d/init.d/htcacheclean
+%endif
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d \
@@ -323,6 +417,7 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
+%if 0%{?with_systemd}
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
 # they need ExecStart[pre|post].
@@ -331,6 +426,7 @@ mkdir $RPM_BUILD_ROOT%{_unitdir}/httpd.socket.d
 
 install -m 644 -p $RPM_SOURCE_DIR/10-listen443.conf \
       $RPM_BUILD_ROOT%{_unitdir}/httpd.socket.d/10-listen443.conf
+%endif
 
 for f in welcome.conf ssl.conf manual.conf userdir.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
@@ -356,14 +452,16 @@ for s in httpd htcacheclean; do
                     $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
 done
 
+%if 0%{?with_systemd}
 # tmpfiles.d configuration
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
 install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
    $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/httpd.conf
+%endif
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT/run/httpd/htcacheclean
+         $RPM_BUILD_ROOT/%{_rundir}/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
 sed -i \
@@ -381,8 +479,8 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
-mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d
-cat > $RPM_BUILD_ROOT%{_rpmconfigdir}/macros.d/macros.httpd <<EOF
+mkdir -p $RPM_BUILD_ROOT/%{_macrosdir}
+cat > $RPM_BUILD_ROOT/%{_macrosdir}/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %%{_bindir}/apxs
 %%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
@@ -422,7 +520,7 @@ ln -s ../../pixmaps/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s /run/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s %{_rundir}/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install http-ssl-pass-dialog
@@ -430,12 +528,14 @@ mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
 	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
 
+%if 0%{?with_systemd}
 # Install action scripts
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
     install -p -m 755 $RPM_SOURCE_DIR/action-${f}.sh \
             $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd/${f}
 done
+%endif
 
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
@@ -448,7 +548,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/run/httpd/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/%{_rundir}/httpd/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -474,6 +574,7 @@ rm -vf \
 
 rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
+
 %pre
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
@@ -485,33 +586,43 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
 %post
+%if 0%{?with_systemd}
 %systemd_post httpd.service htcacheclean.service httpd.socket
+%else
+/sbin/chkconfig --add httpd
+/sbin/chkconfig --add htcacheclean
+%endif
 
 %preun
+%if 0%{?with_systemd}
 %systemd_preun httpd.service htcacheclean.service httpd.socket
+%else
+if [ $1 = 0 ]; then
+	/sbin/service httpd stop > /dev/null 2>&1
+	/sbin/chkconfig --del httpd
+	/sbin/service htcacheclean stop > /dev/null 2>&1
+	/sbin/chkconfig --del htcacheclean
+fi
+%endif
 
 %postun
+%if 0%{?with_systemd}
 %systemd_postun
-
-# Trigger for conversion from SysV, per guidelines at:
-# https://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Systemd
-%triggerun -- httpd < 2.2.21-5
-# Save the current service runlevel info
-# User must manually run systemd-sysv-convert --apply httpd
-# to migrate them to systemd targets
-/usr/bin/systemd-sysv-convert --save httpd.service >/dev/null 2>&1 ||:
-
-# Run these because the SysV package being removed won't do them
-/sbin/chkconfig --del httpd >/dev/null 2>&1 || :
+%endif
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
+%if 0%{?with_systemd}
   /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
+%else
+  /sbin/service httpd condrestart >/dev/null 2>&1 || :
+  /sbin/service htcacheclean condrestart >/dev/null 2>&1 || :
+%endif
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
-%post -n mod_ssl
+%post -n mod%{ius_suffix}_ssl
 umask 077
 
 if [ -f %{sslkey} -o -f %{sslcert} ]; then
@@ -544,8 +655,6 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    exit 1
 fi
 
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
@@ -575,16 +684,21 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
+%if 0%{?with_systemd}
 %{_prefix}/lib/tmpfiles.d/httpd.conf
-
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
 %{_libexecdir}/initscripts/legacy-actions/httpd/*
+%endif
 
 %{_sbindir}/ht*
 %{_sbindir}/fcgistarter
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
+%if 0%{?rhel} >= 7
 %caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+%else
+%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
+%endif
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -605,8 +719,8 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/error/include/*.html
 %{contentdir}/noindex/index.html
 
-%attr(0710,root,apache) %dir /run/httpd
-%attr(0700,apache,apache) %dir /run/httpd/htcacheclean
+%attr(0710,root,apache) %dir %{_rundir}/httpd
+%attr(0700,apache,apache) %dir %{_rundir}/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
@@ -614,10 +728,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_mandir}/man8/*
 
+%if 0%{?with_systemd}
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
 %attr(755,root,root) %dir %{_unitdir}/httpd.service.d
 %attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
+%else
+# sysvinit
+%{_sysconfdir}/rc.d/init.d/httpd
+%{_sysconfdir}/rc.d/init.d/htcacheclean
+%endif
 
 %files filesystem
 %dir %{_sysconfdir}/httpd
@@ -642,27 +762,29 @@ rm -rf $RPM_BUILD_ROOT
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
-%files -n mod_ssl
+%files -n mod%{ius_suffix}_ssl
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_libexecdir}/httpd-ssl-pass-dialog
+%if 0%{?with_systemd}
 %{_unitdir}/httpd.socket.d/10-listen443.conf
+%endif
 
-%files -n mod_proxy_html
+%files -n mod%{ius_suffix}_proxy_html
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_proxy_html.so
 %{_libdir}/httpd/modules/mod_xml2enc.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 
-%files -n mod_ldap
+%files -n mod%{ius_suffix}_ldap
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
-%files -n mod_session
+%files -n mod%{ius_suffix}_session
 %defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
@@ -676,9 +798,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
-%{_rpmconfigdir}/macros.d/macros.httpd
+%{_macrosdir}/macros.httpd
+
 
 %changelog
+* Fri Jan 02 2015 Carl George <carl.george@rackspace.com> - 2.4.10-1.ius
+- Port from Fedora to IUS
+
 * Wed Dec 17 2014 Jan Kaluza <jkaluza@redhat.com> - 2.4.10-15
 - core: fix bypassing of mod_headers rules via chunked requests (CVE-2013-5704)
 - mod_cache: fix NULL pointer dereference on empty Content-Type (CVE-2014-3581)
