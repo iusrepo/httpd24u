@@ -217,7 +217,7 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl >= 0.9.7f-4, /bin/cat, hostname
+Requires(post): openssl >= 0.9.7f-4, /bin/cat, /bin/hostname
 Requires(pre): httpd-filesystem
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
