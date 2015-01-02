@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# htcacheclean     Startup script for the htcacheclean
+#
+# chkconfig: - 85 15
+# description:  Htcacheclean is used to keep the size of \
+#	        mod_cache_disk's storage within a given size limit.
+# processname: htcacheclean
+# config: /etc/sysconfig/htcacheclean
+# pidfile: /var/run/htcacheclean/htcacheclean.pid
+#
+### BEGIN INIT INFO
+# Provides: htcacheclean
+# Required-Start: $local_fs $remote_fs $named
+# Required-Stop: $local_fs $remote_fs
+# Short-Description: start and stop htcacheclean
+# Description:  Htcacheclean is used to keep the size of \
+#  mod_cache_disk's storage within a given size limit.
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# INTERVAL, CACHE_ROOT and CACHE_LIMIT can be set
+# in /etc/sysconfig/htcacheclean configuration file.
+if [ -f /etc/sysconfig/htcacheclean ]; then
+        . /etc/sysconfig/htcacheclean
+fi
+
+# Path to the htcacheclean binary.
+binary=/usr/sbin/htcacheclean
+prog=htcacheclean
+#pidfile=${PIDFILE-/var/run/htcacheclean/htcacheclean.pid}
+lockfile=${LOCKFILE-/var/lock/subsys/htcacheclean}
+interval=${INTERVAL-5}
+cache_path=${CACHE_ROOT-/var/cache/mod_proxy}
+cache_limit=${CACHE_LIMIT-150M}
+RETVAL=0
+
+start() {
+        [ "$EUID" != "0" ] && exit 4
+        echo -n $"Starting $prog: "
+        daemon $binary -d${interval} -n -i -p${cache_path} -l${cache_limit} $OPTIONS
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch ${lockfile}
+        return $RETVAL
+}
+
+stop() {
+	[ "$EUID" != "0" ] && exit 4
+	echo -n $"Stopping $prog: "
+	killproc $binary
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && rm -f ${lockfile}
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+        status $binary
+	RETVAL=$?
+	;;
+  restart)
+	stop
+	start
+	;;
+  condrestart|try-restart)
+	if status $binary >&/dev/null; then
+		stop
+		start
+	fi
+	;;
+  force-reload|reload)
+        exit 3
+	;;
+  *)
+	echo $"Usage: $prog {start|stop|restart|condrestart|try-restart|status|help}"
+	RETVAL=2
+esac
+
+exit $RETVAL
