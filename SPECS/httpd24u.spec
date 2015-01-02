@@ -130,7 +130,7 @@ Requires(post): systemd-units
 Requires: initscripts >= 8.36
 Requires(post): chkconfig
 %endif
-Conflicts: apr < 1.5.0-1
+Requires: apr%{?_isa} >= 1.5.0
 
 # IUS-isms
 Provides: %{real_name} = %{version}-%{release}
