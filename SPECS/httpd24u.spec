@@ -82,8 +82,9 @@ Source42: htcacheclean.init
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
-Patch5: httpd-2.4.3-layout.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
+Patch7: httpd-2.4.3-layout.patch
+Patch8: httpd-2.4.3-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.10-detect-systemd.patch
 # Features/functional changes
@@ -282,8 +283,13 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%patch5 -p1 -b .layout
 %patch6 -p1 -b .apctlsystemd
+
+%if 0%{?rhel} >= 7
+%patch7 -p1 -b .layout
+%else
+%patch8 -p1 -b .layout
+%endif
 
 %if 0%{?with_systemd}
 %patch19 -p1 -b .detectsystemd
