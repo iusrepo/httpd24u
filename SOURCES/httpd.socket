@@ -1,0 +1,10 @@
+[Unit]
+Description=Apache httpd Server Socket
+
+[Socket]
+ListenStream=80
+NoDelay=true
+DeferAcceptSec=30
+
+[Install]
+WantedBy=sockets.target
