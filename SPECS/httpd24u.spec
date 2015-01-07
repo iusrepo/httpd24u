@@ -121,7 +121,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
 Requires: httpd-tools = %{version}-%{release}
 Requires: httpd-filesystem = %{version}-%{release}
-Requires(pre): httpd-filesystem
+Requires(pre): httpd-filesystem = %{version}-%{release}
 %if 0%{?with_systemd}
 Requires(preun): systemd-units
 Requires(postun): systemd-units
