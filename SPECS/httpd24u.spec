@@ -41,7 +41,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.10
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -820,6 +820,12 @@ fi
 
 
 %changelog
+* Wed Jan 07 2015 Carl George <carl.george@rackspace.com> - 2.4.10-2.ius
+- Require hostname command, not hostname package
+- Don't install 00-systemd.conf on sysvinit systems
+- Use /var/run on el6, /run on el7
+- Directly require apr and apr-util to ensure we get the right one
+
 * Fri Jan 02 2015 Carl George <carl.george@rackspace.com> - 2.4.10-1.ius
 - Port from Fedora to IUS
 
