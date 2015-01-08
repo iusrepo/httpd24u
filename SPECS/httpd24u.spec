@@ -1,5 +1,6 @@
 %global real_name httpd
 %global ius_suffix 24u
+%global apr apr15u
 
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
@@ -110,7 +111,7 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pcre-devel >= 5.0
+BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
 %if 0%{?with_systemd}
 BuildRequires: systemd-devel
 %endif
@@ -130,8 +131,8 @@ Requires(post): systemd-units
 Requires: initscripts >= 8.36
 Requires(post): chkconfig
 %endif
-Requires: apr%{?_isa} >= 1.5.0
-Requires: apr-util%{?_isa} >= 1.5.0
+Requires: %{apr}%{?_isa} >= 1.5.0
+Requires: %{apr}-util%{?_isa} >= 1.5.0
 
 # IUS-isms
 Provides: %{real_name} = %{version}-%{release}
@@ -151,7 +152,7 @@ web server.
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
-Requires: apr-devel >= 1.5.0, apr-util-devel >= 1.5.0, pkgconfig
+Requires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pkgconfig
 Requires: httpd = %{version}-%{release}
 # IUS-isms
 Provides: %{real_name}-devel = %{version}-%{release}
@@ -254,7 +255,7 @@ transform and modify HTML and XML content.
 Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Requires: apr-util-ldap >= 1.5.0
+Requires: %{apr}-util-ldap >= 1.5.0
 # IUS-isms
 Provides: mod_ldap = %{version}-%{release}
 Provides: mod_ldap%{?_isa} = %{version}-%{release}
@@ -820,11 +821,11 @@ fi
 
 
 %changelog
-* Wed Jan 07 2015 Carl George <carl.george@rackspace.com> - 2.4.10-2.ius
+* Thu Jan 08 2015 Carl George <carl.george@rackspace.com> - 2.4.10-2.ius
 - Require hostname command, not hostname package
 - Don't install 00-systemd.conf on sysvinit systems
 - Use /var/run on el6, /run on el7
-- Directly require apr and apr-util to ensure we get the right one
+- Explictly require the IUS versions of apr and apr-devel
 
 * Fri Jan 02 2015 Carl George <carl.george@rackspace.com> - 2.4.10-1.ius
 - Port from Fedora to IUS
