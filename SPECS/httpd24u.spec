@@ -41,8 +41,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.10
-Release: 2.ius%{?dist}
+Version: 2.4.11
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -821,6 +821,9 @@ fi
 
 
 %changelog
+* Mon Jan 19 2015 Carl George <carl.george@rackspace.com> - 2.4.11-1.ius
+- Latest upstream
+
 * Thu Jan 08 2015 Carl George <carl.george@rackspace.com> - 2.4.10-2.ius
 - Require hostname command, not hostname package
 - Don't install 00-systemd.conf on sysvinit systems
