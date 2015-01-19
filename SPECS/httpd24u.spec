@@ -44,7 +44,8 @@ Name: %{real_name}%{ius_suffix}
 Version: 2.4.11
 Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+#Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+Source0: https://github.com/apache/%{real_name}/archive/%{version}.tar.gz
 Source1: index.html
 Source2: httpd.logrotate
 Source3: httpd.sysconf
