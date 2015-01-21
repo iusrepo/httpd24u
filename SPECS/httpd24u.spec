@@ -42,7 +42,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.10
-Release: 2.ius%{?dist}
+Release: 3.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -821,6 +821,10 @@ fi
 
 
 %changelog
+* Wed Jan 21 2015 Carl George <carl.george@rackspace.com> - 2.4.10-3.ius
+- MPM is now a loadable module, make HTTPD static in init script
+- Update comments in sysconf file for variables that are still valid
+
 * Thu Jan 08 2015 Carl George <carl.george@rackspace.com> - 2.4.10-2.ius
 - Require hostname command, not hostname package
 - Don't install 00-systemd.conf on sysvinit systems

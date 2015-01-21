@@ -34,13 +34,9 @@ HTTPD_LANG=${HTTPD_LANG-"C"}
 # mod_ssl needs a pass-phrase from the user.
 INITLOG_ARGS=""
 
-# Set HTTPD=/usr/sbin/httpd.worker in /etc/sysconfig/httpd to use a server
-# with the thread-based "worker" MPM; BE WARNED that some modules may not
-# work correctly with a thread-based MPM; notably PHP will refuse to start.
-
 # Path to the apachectl script, server binary, and short-form for messages.
 apachectl=/usr/sbin/apachectl
-httpd=${HTTPD-/usr/sbin/httpd}
+httpd=/usr/sbin/httpd
 prog=httpd
 pidfile=${PIDFILE-/var/run/httpd/httpd.pid}
 lockfile=${LOCKFILE-/var/lock/subsys/httpd}
