@@ -41,8 +41,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.10
-Release: 3.ius%{?dist}
+Version: 2.4.12
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source1: index.html
@@ -103,10 +103,7 @@ Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
-Patch100: httpd-2.4.6-CVE-2013-5704.patch
-Patch101: httpd-2.4.6-CVE-2014-3581.patch
-Patch102: httpd-2.4.10-CVE-2014-3583.patch
-Patch103: httpd-2.4.10-CVE-2014-8109.patch
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
@@ -314,11 +311,6 @@ interface for storing and accessing per-user session data.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-
-%patch100 -p1 -b cve20135704
-%patch101 -p1 -b cve20143581
-%patch102 -p1 -b cve20143583
-%patch103 -p1 -b cve20148109
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -676,8 +668,6 @@ fi
 
 
 %files
-%defattr(-,root,root)
-
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
 %doc docs/conf/extra/*.conf
 
@@ -769,7 +759,6 @@ fi
 %dir %{contentdir}/icons
 
 %files tools
-%defattr(-,root,root)
 %{_bindir}/*
 %{_mandir}/man1/*
 %doc LICENSE NOTICE
@@ -777,12 +766,10 @@ fi
 %exclude %{_mandir}/man1/apxs.1*
 
 %files manual
-%defattr(-,root,root)
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
 %files -n mod%{ius_suffix}_ssl
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
@@ -793,24 +780,20 @@ fi
 %endif
 
 %files -n mod%{ius_suffix}_proxy_html
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_proxy_html.so
 %{_libdir}/httpd/modules/mod_xml2enc.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 
 %files -n mod%{ius_suffix}_ldap
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
 %files -n mod%{ius_suffix}_session
-%defattr(-,root,root)
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %files devel
-%defattr(-,root,root)
 %{_includedir}/httpd
 %{_bindir}/apxs
 %{_mandir}/man1/apxs.1*
@@ -821,6 +804,13 @@ fi
 
 
 %changelog
+* Wed Jan 28 2015 Carl George <carl.george@rackspace.com> - 2.4.12-1.ius
+- Latest upstream
+- Patch100 fixed upstream (CVE-2013-5704)
+- Patch101 fixed upstream (CVE-2014-3581)
+- Patch102 fixed upstream (CVE-2014-3583)
+- Patch103 fixed upstream (CVE-2014-8109)
+
 * Wed Jan 21 2015 Carl George <carl.george@rackspace.com> - 2.4.10-3.ius
 - MPM is now a loadable module, make HTTPD static in init script
 - Update comments in sysconf file for variables that are still valid
