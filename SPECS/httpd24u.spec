@@ -42,10 +42,9 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.12
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-Source1: index.html
 Source2: httpd.logrotate
 Source3: httpd.sysconf
 Source4: httpd-ssl-pass-dialog
@@ -502,7 +501,7 @@ EOF
 
 # Handle contentdir
 mkdir $RPM_BUILD_ROOT%{contentdir}/noindex
-install -m 644 -p $RPM_SOURCE_DIR/index.html \
+install -m 644 -p docs/docroot/index.html \
         $RPM_BUILD_ROOT%{contentdir}/noindex/index.html
 rm -rf %{contentdir}/htdocs
 
@@ -804,6 +803,9 @@ fi
 
 
 %changelog
+* Tue Feb 03 2015 Carl George <carl.george@rackspace.com> - 2.4.12-2.ius
+- Use upstream noindex page instead of custom welcome page
+
 * Wed Jan 28 2015 Carl George <carl.george@rackspace.com> - 2.4.12-1.ius
 - Latest upstream
 - Patch100 fixed upstream (CVE-2013-5704)
