@@ -337,7 +337,7 @@ autoheader && autoconf || exit 1
 
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
-	support/apxs.in
+        support/apxs.in
 
 export CFLAGS=$RPM_OPT_FLAGS
 export LDFLAGS="-Wl,-z,relro,-z,now"
@@ -347,41 +347,41 @@ export LYNX_PATH=/usr/bin/links
 
 # Build the daemon
 ./configure \
- 	--prefix=%{_sysconfdir}/httpd \
- 	--exec-prefix=%{_prefix} \
- 	--bindir=%{_bindir} \
- 	--sbindir=%{_sbindir} \
- 	--mandir=%{_mandir} \
-	--libdir=%{_libdir} \
-	--sysconfdir=%{_sysconfdir}/httpd/conf \
-	--includedir=%{_includedir}/httpd \
-	--libexecdir=%{_libdir}/httpd/modules \
-	--datadir=%{contentdir} \
+        --prefix=%{_sysconfdir}/httpd \
+        --exec-prefix=%{_prefix} \
+        --bindir=%{_bindir} \
+        --sbindir=%{_sbindir} \
+        --mandir=%{_mandir} \
+        --libdir=%{_libdir} \
+        --sysconfdir=%{_sysconfdir}/httpd/conf \
+        --includedir=%{_includedir}/httpd \
+        --libexecdir=%{_libdir}/httpd/modules \
+        --datadir=%{contentdir} \
         --enable-layout=Fedora \
         --with-installbuilddir=%{_libdir}/httpd/build \
         --enable-mpms-shared=all \
         --with-apr=%{_bindir}/%{apr}-%{aprver}-config \
         --with-apr-util=%{_bindir}/%{apu}-%{apuver}-config \
-	--enable-suexec --with-suexec \
+        --enable-suexec --with-suexec \
         --enable-suexec-capabilities \
-	--with-suexec-caller=%{suexec_caller} \
-	--with-suexec-docroot=%{docroot} \
-	--without-suexec-logfile \
-	--with-suexec-syslog \
-	--with-suexec-bin=%{_sbindir}/suexec \
-	--with-suexec-uidmin=%{suexec_uidmin} --with-suexec-gidmin=%{suexec_gidmin} \
+        --with-suexec-caller=%{suexec_caller} \
+        --with-suexec-docroot=%{docroot} \
+        --without-suexec-logfile \
+        --with-suexec-syslog \
+        --with-suexec-bin=%{_sbindir}/suexec \
+        --with-suexec-uidmin=%{suexec_uidmin} --with-suexec-gidmin=%{suexec_gidmin} \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
-	--enable-ssl --with-ssl --disable-distcache \
-	--enable-proxy \
+        --enable-ssl --with-ssl --disable-distcache \
+        --enable-proxy \
         --enable-cache \
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap  \
-	$*
+        $*
 make %{?_smp_mflags}
 
 
@@ -399,9 +399,9 @@ done
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m755 $RPM_SOURCE_DIR/httpd.init \
-	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+        $RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
 install -m755 $RPM_SOURCE_DIR/htcacheclean.init \
-	$RPM_BUILD_ROOT/etc/rc.d/init.d/htcacheclean
+        $RPM_BUILD_ROOT/etc/rc.d/init.d/htcacheclean
 %endif
 
 # install conf file/directory
@@ -538,7 +538,7 @@ ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 # install http-ssl-pass-dialog
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
-	$RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
+        $RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
 
 %if 0%{?with_systemd}
 # Install action scripts
@@ -552,7 +552,7 @@ done
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
-	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
+        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -595,7 +595,7 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 %pre filesystem
 # Add the "apache" user
 /usr/sbin/useradd -c "Apache" -u 48 \
-	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
+        -s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
 %post
 %if 0%{?with_systemd}
@@ -610,10 +610,10 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 %systemd_preun httpd.service htcacheclean.service httpd.socket
 %else
 if [ $1 = 0 ]; then
-	/sbin/service httpd stop > /dev/null 2>&1
-	/sbin/chkconfig --del httpd
-	/sbin/service htcacheclean stop > /dev/null 2>&1
-	/sbin/chkconfig --del htcacheclean
+        /sbin/service httpd stop > /dev/null 2>&1
+        /sbin/chkconfig --del httpd
+        /sbin/service htcacheclean stop > /dev/null 2>&1
+        /sbin/chkconfig --del htcacheclean
 fi
 %endif
 
