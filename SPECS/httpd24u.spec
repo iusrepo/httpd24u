@@ -1,6 +1,9 @@
 %global real_name httpd
 %global ius_suffix 24u
 %global apr apr15u
+%global apu apu15u
+%global aprver 1
+%define apuver 1
 
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
@@ -359,7 +362,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-layout=Fedora \
         --with-installbuilddir=%{_libdir}/httpd/build \
         --enable-mpms-shared=all \
-        --with-apr=%{_prefix} --with-apr-util=%{_prefix} \
+        --with-apr=%{_bindir}/%{apr}-%{aprver}-config \
+        --with-apr-util=%{_bindir}/%{apu}-%{apuver}-config \
 	--enable-suexec --with-suexec \
         --enable-suexec-capabilities \
 	--with-suexec-caller=%{suexec_caller} \
