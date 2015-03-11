@@ -75,6 +75,7 @@ Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
+Source29: httpd.logrotate-legacy
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -551,8 +552,13 @@ done
 
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
+%if 0%{?with_systemd}
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
         $RPM_BUILD_ROOT/etc/logrotate.d/httpd
+%else
+install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate-legacy \
+        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
+%endif
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
