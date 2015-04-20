@@ -45,7 +45,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.12
-Release: 4.ius%{?dist}
+Release: 5.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -283,7 +283,9 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
+%if 0%{?with_systemd}
 %patch6 -p1 -b .apctlsystemd
+%endif
 
 %if 0%{?rhel} >= 7
 %patch7 -p1 -b .layout
@@ -811,6 +813,9 @@ fi
 
 
 %changelog
+* Mon Apr 20 2015 Carl George <carl.george@rackspace.com> - 2.4.12-5.ius
+- Only apply patch6 when using systemd
+
 * Wed Mar 11 2015 Carl George <carl.george@rackspace.com> - 2.4.12-4.ius
 - Use service command in logrotate file
 
