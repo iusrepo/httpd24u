@@ -44,8 +44,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.12
-Release: 5.ius%{?dist}
+Version: 2.4.16
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -813,6 +813,9 @@ fi
 
 
 %changelog
+* Wed Jul 15 2015 Carl George <carl.george@rackspace.com> - 2.4.16-1.ius
+- Latest upstream
+
 * Mon Apr 20 2015 Carl George <carl.george@rackspace.com> - 2.4.12-5.ius
 - Only apply patch6 when using systemd
 
