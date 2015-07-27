@@ -338,10 +338,6 @@ rm -rf srclib/{apr,apr-util,pcre}
 # regenerate configure scripts
 autoheader && autoconf || exit 1
 
-# Before configure; fix location of build dir in generated apxs
-%{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
-        support/apxs.in
-
 export CFLAGS=$RPM_OPT_FLAGS
 export LDFLAGS="-Wl,-z,relro,-z,now"
 
