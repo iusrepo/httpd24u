@@ -1,7 +1,6 @@
-diff --git a/support/apxs.in b/support/apxs.in
-index ad1287f..efcfcf6 100644
---- a/support/apxs.in
-+++ b/support/apxs.in
+diff -Naurp a/support/apxs.in b/support/apxs.in
+--- a/support/apxs.in	2013-12-26 12:01:53.000000000 -0600
++++ b/support/apxs.in	2015-07-27 13:57:32.581334998 -0500
 @@ -25,7 +25,18 @@ package apxs;
  
  my %config_vars = ();
@@ -14,7 +13,7 @@ index ad1287f..efcfcf6 100644
 +    exit(1);
 +}
 +
-+my $libdir = `pkg-config --variable=libdir apr-1`;
++my $libdir = `pkg-config --variable=libdir apr15u-1`;
 +chomp $libdir;
 +
 +my $installbuilddir = $libdir . "/httpd/build";

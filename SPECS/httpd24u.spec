@@ -3,7 +3,10 @@
 %global apr apr15u
 %global apu apu15u
 %global aprver 1
-%define apuver 1
+%global apuver 1
+%global apr_config %{apr}-%{aprver}-config
+%global apu_config %{apu}-%{apuver}-config
+
 
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
@@ -45,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.16
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -321,6 +324,10 @@ sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
 # Prevent use of setcap in "install-suexec-caps" target.
 sed -i '/suexec/s,setcap ,echo Skipping setcap for ,' Makefile.in
 
+# Use custom IUS apr/apu configuration tools.
+sed -i '/APR_CONFIG=/s,apr-.*-config,%{apr_config},' configure.in
+sed -i '/APU_CONFIG=/s,apu-.*-config,%{apu_config},' configure.in
+
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
@@ -359,8 +366,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-layout=Fedora \
         --with-installbuilddir=%{_libdir}/httpd/build \
         --enable-mpms-shared=all \
-        --with-apr=%{_bindir}/%{apr}-%{aprver}-config \
-        --with-apr-util=%{_bindir}/%{apu}-%{apuver}-config \
+        --with-apr=%{_bindir}/%{apr_config} \
+        --with-apr-util=%{_bindir}/%{apu_config} \
         --enable-suexec --with-suexec \
         --enable-suexec-capabilities \
         --with-suexec-caller=%{suexec_caller} \
@@ -809,6 +816,9 @@ fi
 
 
 %changelog
+* Mon Jul 27 2015 Carl George <carl.george@rackspace.com> - 2.4.16-2.ius
+- Fix apxs and config_vars.mk to respect apr15u custom paths
+
 * Wed Jul 15 2015 Carl George <carl.george@rackspace.com> - 2.4.16-1.ius
 - Latest upstream
 
