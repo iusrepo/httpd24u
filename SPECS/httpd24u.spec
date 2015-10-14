@@ -47,8 +47,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.16
-Release: 2.ius%{?dist}
+Version: 2.4.17
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -816,6 +816,9 @@ fi
 
 
 %changelog
+* Wed Oct 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.17-1.ius
+- Latest upstream
+
 * Mon Jul 27 2015 Carl George <carl.george@rackspace.com> - 2.4.16-2.ius
 - Fix apxs and config_vars.mk to respect apr15u custom paths
 
