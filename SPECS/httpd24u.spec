@@ -47,7 +47,7 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.17
+Version: 2.4.18
 Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -816,6 +816,9 @@ fi
 
 
 %changelog
+* Mon Dec 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.18-1.ius
+- Latest upstream
+
 * Wed Oct 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.17-1.ius
 - Latest upstream
 
