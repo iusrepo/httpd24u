@@ -102,7 +102,7 @@ Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.6-sslmultiproxy.patch
+Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.9-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
@@ -818,6 +818,7 @@ fi
 %changelog
 * Mon Dec 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.18-1.ius
 - Latest upstream
+- update Patch31 from Fedora, http://pkgs.fedoraproject.org/cgit/httpd.git/commit/?id=c791d40a6bdaaea3878c0fcde882db9d7d5a8213
 
 * Wed Oct 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.17-1.ius
 - Latest upstream
