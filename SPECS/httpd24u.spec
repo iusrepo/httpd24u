@@ -103,7 +103,7 @@ Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
-Patch34: httpd-2.4.9-socket-activation.patch
+Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
