@@ -110,11 +110,16 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
 
+Source100: 00-http2.conf
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
+%if 0%{?rhel} >= 7
+BuildRequires: libnghttp2-devel
+%endif
 %if 0%{?with_systemd}
 BuildRequires: systemd-devel
 %endif
@@ -423,6 +428,13 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
+
+%if 0%{?rhel} >= 7
+for f in 00-http2.conf; do
+  install -m 644 -p $RPM_SOURCE_DIR/$f \
+        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
+done
+%endif
 
 %if 0%{?with_systemd}
 for f in 00-systemd.conf; do
