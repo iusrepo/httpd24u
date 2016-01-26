@@ -117,9 +117,7 @@ Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
-%if 0%{?rhel} >= 7
 BuildRequires: libnghttp2-devel
-%endif
 %if 0%{?with_systemd}
 BuildRequires: systemd-devel
 %endif
@@ -424,17 +422,10 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 01-session.conf 00-optional.conf; do
+         01-ldap.conf 01-session.conf 00-optional.conf 00-http2.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
-
-%if 0%{?rhel} >= 7
-for f in 00-http2.conf; do
-  install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
-done
-%endif
 
 %if 0%{?with_systemd}
 for f in 00-systemd.conf; do
