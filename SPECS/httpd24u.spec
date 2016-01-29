@@ -103,18 +103,21 @@ Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
-Patch34: httpd-2.4.9-socket-activation.patch
+Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
 Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
 
+Source100: 00-http2.conf
+
 License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
+BuildRequires: libnghttp2-devel
 %if 0%{?with_systemd}
 BuildRequires: systemd-devel
 %endif
@@ -419,7 +422,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 01-session.conf 00-optional.conf; do
+         01-ldap.conf 01-session.conf 00-optional.conf 00-http2.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
