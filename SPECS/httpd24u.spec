@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.18
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -819,6 +819,9 @@ fi
 
 
 %changelog
+* Fri Jan 29 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.18-2.ius
+- add http2 support, see gh issue #5
+
 * Mon Dec 14 2015 Ben Harper <ben.harper@rackspace.com> - 2.4.18-1.ius
 - Latest upstream
 - update Patch31 from Fedora, http://pkgs.fedoraproject.org/cgit/httpd.git/commit/?id=c791d40a6bdaaea3878c0fcde882db9d7d5a8213
