@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.18
-Release: 2.ius%{?dist}
+Release: 3.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -109,8 +109,6 @@ Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
-
-Source100: 00-http2.conf
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -422,7 +420,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 01-session.conf 00-optional.conf 00-http2.conf; do
+         01-ldap.conf 01-session.conf 00-optional.conf ; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
@@ -819,6 +817,9 @@ fi
 
 
 %changelog
+* Fri Feb 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.8-3.ius
+- move loading of http2 module into 00-base.conf
+
 * Fri Jan 29 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.18-2.ius
 - add http2 support, see gh issue #5
 
