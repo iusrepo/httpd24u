@@ -817,7 +817,7 @@ fi
 
 
 %changelog
-* Fri Feb 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.8-3.ius
+* Fri Feb 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.18-3.ius
 - move loading of http2 module into 00-base.conf
 
 * Fri Jan 29 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.18-2.ius
