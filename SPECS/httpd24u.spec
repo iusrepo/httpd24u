@@ -47,8 +47,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.18
-Release: 3.ius%{?dist}
+Version: 2.4.20
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -817,6 +817,10 @@ fi
 
 
 %changelog
+* Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.19-1.ius
+- Latest upstream
+- update Patch6 from Fedora, http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=37b82598ea6144cabe9fe6466d1fc9e165f19344
+
 * Fri Feb 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.18-3.ius
 - move loading of http2 module into 00-base.conf
 

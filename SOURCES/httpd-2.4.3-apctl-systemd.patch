@@ -1,11 +1,13 @@
 
+Make apachectl run via systemctl.
+
+Note: "apachectl graceful" is documented to start httpd if not running.
+
 Upstream-Status: vendor specific patch
 
-diff --git a/support/apachectl.in b/support/apachectl.in
-index c6ac3ea..2599386 100644
---- a/support/apachectl.in
-+++ b/support/apachectl.in
-@@ -100,9 +100,24 @@ fi
+--- httpd-2.4.18/support/apachectl.in.apctlsystemd
++++ httpd-2.4.18/support/apachectl.in
+@@ -100,9 +100,28 @@ fi
  ERROR=$?
  }
  
@@ -24,7 +26,11 @@ index c6ac3ea..2599386 100644
 +    ERROR=$?
 +    ;;
 +graceful)
-+    /usr/bin/systemctl reload httpd.service
++    if /usr/bin/systemctl -q is-active httpd.service; then
++        /usr/bin/systemctl reload httpd.service
++    else
++        /usr/bin/systemctl start httpd.service
++    fi
 +    ERROR=$?
 +    ;;
 +graceful-stop)
@@ -32,7 +38,7 @@ index c6ac3ea..2599386 100644
      ERROR=$?
      ;;
  startssl|sslstart|start-SSL)
-@@ -114,10 +129,6 @@ startssl|sslstart|start-SSL)
+@@ -114,10 +133,6 @@ startssl|sslstart|start-SSL)
  configtest)
      testconfig
      ;;
