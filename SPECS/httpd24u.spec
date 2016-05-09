@@ -817,7 +817,7 @@ fi
 
 
 %changelog
-* Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.19-1.ius
+* Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
 - update Patch6 from Fedora, http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=37b82598ea6144cabe9fe6466d1fc9e165f19344
 
