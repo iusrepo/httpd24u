@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.20
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -217,7 +217,7 @@ The httpd-tools package contains tools which can be used with
 the Apache HTTP Server.
 
 
-%package -n mod%{ius_suffix}_ssl
+%package mod_ssl
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
@@ -229,15 +229,18 @@ Obsoletes: stronghold-mod_ssl
 # IUS-isms
 Provides: mod_ssl = %{version}-%{release}
 Provides: mod_ssl%{?_isa} = %{version}-%{release}
+Provides: mod%{ius_suffix}_ssl = %{version}-%{release}
+Provides: mod%{ius_suffix}_ssl%{?_isa} = %{version}-%{release}
+Obsoletes: mod%{ius_suffix}_ssl < 2.4.20-2.ius
 Conflicts: mod_ssl < %{version}
 
-%description -n mod%{ius_suffix}_ssl
+%description mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
 server via the Secure Sockets Layer (SSL) and Transport Layer
 Security (TLS) protocols.
 
 
-%package -n mod%{ius_suffix}_proxy_html
+%package mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
@@ -246,14 +249,17 @@ Epoch: 1
 # IUS-isms
 Provides: mod_proxy_html = %{version}-%{release}
 Provides: mod_proxy_html%{?_isa} = %{version}-%{release}
+Provides: mod%{ius_suffix}_proxy_html = %{version}-%{release}
+Provides: mod%{ius_suffix}_proxy_html%{?_isa} = %{version}-%{release}
+Obsoletes: mod%{ius_suffix}_proxy_html < 2.4.20-2.ius
 Conflicts: mod_proxy_html < %{version}
 
-%description -n mod%{ius_suffix}_proxy_html
+%description mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
 transform and modify HTML and XML content.
 
 
-%package -n mod%{ius_suffix}_ldap
+%package mod_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
@@ -261,23 +267,29 @@ Requires: %{apr}-util-ldap >= 1.5.0
 # IUS-isms
 Provides: mod_ldap = %{version}-%{release}
 Provides: mod_ldap%{?_isa} = %{version}-%{release}
+Provides: mod%{ius_suffix}_ldap = %{version}-%{release}
+Provides: mod%{ius_suffix}_ldap%{?_isa} = %{version}-%{release}
+Obsoletes: mod%{ius_suffix}_ldap < 2.4.20-2.ius
 Conflicts: mod_ldap < %{version}
 
-%description -n mod%{ius_suffix}_ldap
+%description mod_ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
 
-%package -n mod%{ius_suffix}_session
+%package mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 # IUS-isms
 Provides: mod_session = %{version}-%{release}
 Provides: mod_session%{?_isa} = %{version}-%{release}
+Provides: mod%{ius_suffix}_session = %{version}-%{release}
+Provides: mod%{ius_suffix}_session%{?_isa} = %{version}-%{release}
+Obsoletes: mod%{ius_suffix}_session < 2.4.20-2.ius
 Conflicts: mod_session < %{version}
 
-%description -n mod%{ius_suffix}_session
+%description mod_session
 The mod_session module and associated backends provide an abstract
 interface for storing and accessing per-user session data.
 
@@ -646,7 +658,7 @@ test -f /etc/sysconfig/httpd-disable-posttrans || \
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
 
-%post -n mod%{ius_suffix}_ssl
+%post mod_ssl
 umask 077
 
 if [ -f %{sslkey} -o -f %{sslcert} ]; then
@@ -782,7 +794,7 @@ fi
 %{contentdir}/manual
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/manual.conf
 
-%files -n mod%{ius_suffix}_ssl
+%files mod_ssl
 %{_libdir}/httpd/modules/mod_ssl.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
@@ -792,16 +804,16 @@ fi
 %{_unitdir}/httpd.socket.d/10-listen443.conf
 %endif
 
-%files -n mod%{ius_suffix}_proxy_html
+%files mod_proxy_html
 %{_libdir}/httpd/modules/mod_proxy_html.so
 %{_libdir}/httpd/modules/mod_xml2enc.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 
-%files -n mod%{ius_suffix}_ldap
+%files mod_ldap
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
-%files -n mod%{ius_suffix}_session
+%files mod_session
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
@@ -817,6 +829,9 @@ fi
 
 
 %changelog
+* Wed May 11 2016 Carl George <carl.george@rackspace.com> - 2.4.20-2.ius
+- Rename module subpackages from mod24u_* to httpd24u-mod_*
+
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
 - update Patch6 from Fedora, http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=37b82598ea6144cabe9fe6466d1fc9e165f19344
