@@ -458,7 +458,7 @@ for f in welcome.conf ssl.conf manual.conf userdir.conf; do
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
-%if 0%{?rhel} < 7
+%if ! 0%{?with_systemd}
 # el6 should use /var/run, not /run
 sed -i '/^SSLSessionCache/s,/run,%{_rundir},' \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/ssl.conf
