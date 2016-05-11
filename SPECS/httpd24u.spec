@@ -687,6 +687,14 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    : modules contain non-relocatable code
    exit 1
 fi
+# Ensure every mod_* that's built is loaded.
+for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
+  m=${f##*/}
+  if ! grep -q $m $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf; then
+    echo ERROR: Module $m not configured.  Disable it, or load it.
+    exit 1
+  fi
+done
 
 
 %files
@@ -830,6 +838,7 @@ fi
 - Rename module subpackages from mod24u_* to httpd24u-mod_*
 - Remove httpd24u pre script (duplicate of httpd24u-filesystem's) (Fedora)
 - In httpd24u-filesystem pre script, create group/user if non-existent (Fedora)
+- Check every built mod_* is configured (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
