@@ -612,9 +612,11 @@ rm -rf $RPM_BUILD_ROOT/etc/httpd/conf/{original,extra}
 
 
 %pre filesystem
-# Add the "apache" user
-/usr/sbin/useradd -c "Apache" -u 48 \
-        -s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
+getent group apache >/dev/null || groupadd -g 48 -r apache
+getent passwd apache >/dev/null || \
+  useradd -r -u 48 -g apache -s /sbin/nologin \
+    -d %{contentdir} -c "Apache" apache
+exit 0
 
 %post
 %if 0%{?with_systemd}
@@ -827,6 +829,7 @@ fi
 * Wed May 11 2016 Carl George <carl.george@rackspace.com> - 2.4.20-2.ius
 - Rename module subpackages from mod24u_* to httpd24u-mod_*
 - Remove httpd24u pre script (duplicate of httpd24u-filesystem's) (Fedora)
+- In httpd24u-filesystem pre script, create group/user if non-existent (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
