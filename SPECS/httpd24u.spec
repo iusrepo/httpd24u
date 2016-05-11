@@ -638,8 +638,8 @@ if [ $1 = 0 ]; then
 fi
 %endif
 
-%postun
 %if 0%{?with_systemd}
+%postun
 %systemd_postun
 %endif
 
