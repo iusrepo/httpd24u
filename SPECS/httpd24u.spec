@@ -841,6 +841,7 @@ done
 - In httpd24u-filesystem pre script, create group/user if non-existent (Fedora)
 - Check every built mod_* is configured (Fedora)
 - Don't build mod_asis, mod_file_cache (Fedora)
+- Load mod_cache_socache, mod_proxy_wstunnel by default (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
