@@ -399,7 +399,8 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap  \
+        --disable-imagemap --disable-file-cache \
+        --disable-asis
         $*
 make %{?_smp_mflags}
 
@@ -839,6 +840,7 @@ done
 - Remove httpd24u pre script (duplicate of httpd24u-filesystem's) (Fedora)
 - In httpd24u-filesystem pre script, create group/user if non-existent (Fedora)
 - Check every built mod_* is configured (Fedora)
+- Don't build mod_asis, mod_file_cache (Fedora)
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
