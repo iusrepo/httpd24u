@@ -124,9 +124,9 @@ Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
-Requires: httpd-tools = %{version}-%{release}
-Requires: httpd-filesystem = %{version}-%{release}
-Requires(pre): httpd-filesystem = %{version}-%{release}
+Requires: %{name}-tools = %{version}-%{release}
+Requires: %{name}-filesystem = %{version}-%{release}
+Requires(pre): %{name}-filesystem = %{version}-%{release}
 %if 0%{?with_systemd}
 Requires(preun): systemd-units
 Requires(postun): systemd-units
@@ -155,14 +155,14 @@ Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pkgconfig
-Requires: httpd = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 # IUS-isms
 Provides: %{real_name}-devel = %{version}-%{release}
 Provides: %{real_name}-devel%{?_isa} = %{version}-%{release}
 Conflicts: %{real_name}-devel < %{version}
 
 %description devel
-The httpd-devel package contains the APXS binary and other files
+The %{name}-devel package contains the APXS binary and other files
 that you need to build Dynamic Shared Objects (DSOs) for the
 Apache HTTP Server.
 
@@ -174,7 +174,7 @@ to install this package.
 %package manual
 Group: Documentation
 Summary: Documentation for the Apache HTTP server
-Requires: httpd = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
 BuildArch: noarch
 # IUS-isms
@@ -183,7 +183,7 @@ Provides: %{real_name}-manual%{?_isa} = %{version}-%{release}
 Conflicts: %{real_name}-manual < %{version}
 
 %description manual
-The httpd-manual package contains the complete manual and
+The %{name}-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.2/.
 
@@ -199,7 +199,7 @@ Provides: %{real_name}-filesystem%{?_isa} = %{version}-%{release}
 Conflicts: %{real_name}-filesystem < %{version}
 
 %description filesystem
-The httpd-filesystem package contains the basic directory layout
+The %{name}-filesystem package contains the basic directory layout
 for the Apache HTTP server including the correct permissions
 for the directories.
 
@@ -213,7 +213,7 @@ Provides: %{real_name}-tools%{?_isa} = %{version}-%{release}
 Conflicts: %{real_name}-tools < %{version}
 
 %description tools
-The httpd-tools package contains tools which can be used with 
+The %{name}-tools package contains tools which can be used with
 the Apache HTTP Server.
 
 
@@ -223,8 +223,8 @@ Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat, /bin/hostname
-Requires(pre): httpd-filesystem
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires(pre): %{name}-filesystem
+Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
 # IUS-isms
 Provides: mod_ssl = %{version}-%{release}
@@ -243,7 +243,7 @@ Security (TLS) protocols.
 %package mod_proxy_html
 Group: System Environment/Daemons
 Summary: HTML and XML content filters for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
 Epoch: 1
 # IUS-isms
@@ -262,7 +262,7 @@ transform and modify HTML and XML content.
 %package mod_ldap
 Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: %{apr}-util-ldap >= 1.5.0
 # IUS-isms
 Provides: mod_ldap = %{version}-%{release}
@@ -280,7 +280,7 @@ authentication to the Apache HTTP Server.
 %package mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 # IUS-isms
 Provides: mod_session = %{version}-%{release}
 Provides: mod_session%{?_isa} = %{version}-%{release}
@@ -842,6 +842,7 @@ done
 - Check every built mod_* is configured (Fedora)
 - Don't build mod_asis, mod_file_cache (Fedora)
 - Load mod_cache_socache, mod_proxy_wstunnel by default (Fedora)
+- Reference httpd24u explictly in requires and descriptions
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
