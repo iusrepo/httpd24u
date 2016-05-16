@@ -227,12 +227,12 @@ Requires(pre): %{name}-filesystem
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Obsoletes: stronghold-mod_ssl
 # IUS-isms
-Provides: mod_ssl = %{version}-%{release}
-Provides: mod_ssl%{?_isa} = %{version}-%{release}
-Provides: mod%{ius_suffix}_ssl = %{version}-%{release}
-Provides: mod%{ius_suffix}_ssl%{?_isa} = %{version}-%{release}
-Obsoletes: mod%{ius_suffix}_ssl < 2.4.20-2.ius
-Conflicts: mod_ssl < %{version}
+Provides: mod_ssl = 1:%{version}-%{release}
+Provides: mod_ssl%{?_isa} = 1:%{version}-%{release}
+Provides: mod%{ius_suffix}_ssl = 1:%{version}-%{release}
+Provides: mod%{ius_suffix}_ssl%{?_isa} = 1:%{version}-%{release}
+Obsoletes: mod%{ius_suffix}_ssl < 1:2.4.20-2.ius
+Conflicts: mod_ssl < 1:%{version}-%{release}
 
 %description mod_ssl
 The mod_ssl module provides strong cryptography for the Apache Web
@@ -247,12 +247,12 @@ Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
 Epoch: 1
 # IUS-isms
-Provides: mod_proxy_html = %{version}-%{release}
-Provides: mod_proxy_html%{?_isa} = %{version}-%{release}
-Provides: mod%{ius_suffix}_proxy_html = %{version}-%{release}
-Provides: mod%{ius_suffix}_proxy_html%{?_isa} = %{version}-%{release}
-Obsoletes: mod%{ius_suffix}_proxy_html < 2.4.20-2.ius
-Conflicts: mod_proxy_html < %{version}
+Provides: mod_proxy_html = 1:%{version}-%{release}
+Provides: mod_proxy_html%{?_isa} = 1:%{version}-%{release}
+Provides: mod%{ius_suffix}_proxy_html = 1:%{version}-%{release}
+Provides: mod%{ius_suffix}_proxy_html%{?_isa} = 1:%{version}-%{release}
+Obsoletes: mod%{ius_suffix}_proxy_html < 1:2.4.20-2.ius
+Conflicts: mod_proxy_html < 1:%{version}-%{release}
 
 %description mod_proxy_html
 The mod_proxy_html and mod_xml2enc modules provide filters which can
@@ -843,6 +843,7 @@ done
 - Don't build mod_asis, mod_file_cache (Fedora)
 - Load mod_cache_socache, mod_proxy_wstunnel by default (Fedora)
 - Reference httpd24u explictly in requires and descriptions
+- Add epochs to provides/conflicts on mod_ssl and mod_proxy_html subpackages
 
 * Mon Apr 11 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.20-1.ius
 - Latest upstream
