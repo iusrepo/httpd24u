@@ -1,0 +1,388 @@
+# ./pullrev.sh 1332643 1345599 1487772
+ 
+https://bugzilla.redhat.com//show_bug.cgi?id=809599
+
+Backport of (deprecated) NPN support from upstream, with
+added support for Protocols in the same way as ALPN is
+supported.
+
+Upstream commits:
+
+http://svn.apache.org/viewvc?view=revision&revision=1332643
+http://svn.apache.org/viewvc?view=revision&revision=1345599
+http://svn.apache.org/viewvc?view=revision&revision=1487772
+
+diff -uap httpd-2.4.18/modules/ssl/mod_ssl.c.r1332643+ httpd-2.4.18/modules/ssl/mod_ssl.c
+--- httpd-2.4.18/modules/ssl/mod_ssl.c.r1332643+
++++ httpd-2.4.18/modules/ssl/mod_ssl.c
+@@ -439,6 +439,13 @@ int ssl_engine_disable(conn_rec *c)
+     return 1;
+ }
+ 
++static int modssl_register_npn(conn_rec *c, 
++                               ssl_npn_advertise_protos advertisefn,
++                               ssl_npn_proto_negotiated negotiatedfn)
++{
++    return DECLINED;
++}
++
+ int ssl_init_ssl_connection(conn_rec *c, request_rec *r)
+ {
+     SSLSrvConfigRec *sc;
+@@ -624,6 +631,7 @@ static void ssl_register_hooks(apr_pool_
+ 
+     APR_REGISTER_OPTIONAL_FN(ssl_proxy_enable);
+     APR_REGISTER_OPTIONAL_FN(ssl_engine_disable);
++    APR_REGISTER_OPTIONAL_FN(modssl_register_npn);
+ 
+     ap_register_auth_provider(p, AUTHZ_PROVIDER_GROUP, "ssl",
+                               AUTHZ_PROVIDER_VERSION,
+diff -uap httpd-2.4.18/modules/ssl/mod_ssl.h.r1332643+ httpd-2.4.18/modules/ssl/mod_ssl.h
+--- httpd-2.4.18/modules/ssl/mod_ssl.h.r1332643+
++++ httpd-2.4.18/modules/ssl/mod_ssl.h
+@@ -63,5 +63,40 @@ APR_DECLARE_OPTIONAL_FN(int, ssl_proxy_e
+ 
+ APR_DECLARE_OPTIONAL_FN(int, ssl_engine_disable, (conn_rec *));
+ 
++/** The npn_advertise_protos callback allows another modules to add
++ * entries to the list of protocol names advertised by the server
++ * during the Next Protocol Negotiation (NPN) portion of the SSL
++ * handshake.  The callback is given the connection and an APR array;
++ * it should push one or more char*'s pointing to NUL-terminated
++ * strings (such as "http/1.1" or "spdy/2") onto the array and return
++ * OK.  To prevent further processing of (other modules') callbacks,
++ * return DONE. */
++typedef int (*ssl_npn_advertise_protos)(conn_rec *connection, 
++                                        apr_array_header_t *protos);
++
++/** The npn_proto_negotiated callback allows other modules to discover
++ * the name of the protocol that was chosen during the Next Protocol
++ * Negotiation (NPN) portion of the SSL handshake.  Note that this may
++ * be the empty string (in which case modules should probably assume
++ * HTTP), or it may be a protocol that was never even advertised by
++ * the server.  The callback is given the connection, a
++ * non-NUL-terminated string containing the protocol name, and the
++ * length of the string; it should do something appropriate
++ * (i.e. insert or remove filters) and return OK.  To prevent further
++ * processing of (other modules') callbacks, return DONE. */
++typedef int (*ssl_npn_proto_negotiated)(conn_rec *connection, 
++                                        const char *proto_name,
++                                        apr_size_t proto_name_len);
++
++/* An optional function which can be used to register a pair of
++ * callbacks for NPN handling.  This optional function should be
++ * invoked from a pre_connection hook which runs *after* mod_ssl.c's
++ * pre_connection hook.  The function returns OK if the callbacks are
++ * register, or DECLINED otherwise (for example if mod_ssl does not
++l * support NPN).  */
++APR_DECLARE_OPTIONAL_FN(int, modssl_register_npn, (conn_rec *conn, 
++                                                   ssl_npn_advertise_protos advertisefn,
++                                                   ssl_npn_proto_negotiated negotiatedfn));
++
+ #endif /* __MOD_SSL_H__ */
+ /** @} */
+diff -uap httpd-2.4.18/modules/ssl/ssl_engine_init.c.r1332643+ httpd-2.4.18/modules/ssl/ssl_engine_init.c
+--- httpd-2.4.18/modules/ssl/ssl_engine_init.c.r1332643+
++++ httpd-2.4.18/modules/ssl/ssl_engine_init.c
+@@ -636,6 +636,11 @@ static void ssl_init_ctx_callbacks(serve
+ #ifdef HAVE_TLS_ALPN
+     SSL_CTX_set_alpn_select_cb(ctx, ssl_callback_alpn_select, NULL);
+ #endif
++
++#ifdef HAVE_TLS_NPN
++    SSL_CTX_set_next_protos_advertised_cb(
++        ctx, ssl_callback_AdvertiseNextProtos, NULL);
++#endif
+ }
+ 
+ static apr_status_t ssl_init_ctx_verify(server_rec *s,
+diff -uap httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+ httpd-2.4.18/modules/ssl/ssl_engine_io.c
+--- httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+
++++ httpd-2.4.18/modules/ssl/ssl_engine_io.c
+@@ -319,6 +319,7 @@ typedef struct {
+     apr_pool_t *pool;
+     char buffer[AP_IOBUFSIZE];
+     ssl_filter_ctx_t *filter_ctx;
++    int npn_finished;  /* 1 if NPN has finished, 0 otherwise */
+ } bio_filter_in_ctx_t;
+ 
+ /*
+@@ -1377,6 +1378,38 @@ static apr_status_t ssl_io_filter_input(
+         return ssl_io_filter_error(f, bb, status, is_init);
+     }
+ 
++#ifdef HAVE_TLS_NPN
++    /* By this point, Next Protocol Negotiation (NPN) should be completed (if
++     * our version of OpenSSL supports it).  If we haven't already, find out
++     * which protocol was decided upon and inform other modules by calling
++     * npn_proto_negotiated_hook. */
++    if (!inctx->npn_finished) {
++        SSLConnRec *sslconn = myConnConfig(f->c);
++        apr_array_header_t *protos = apr_array_make(f->c->pool, 1, sizeof(char *));
++        const unsigned char *next_proto = NULL;
++        unsigned next_proto_len = 0;
++        const unsigned char *out;
++        unsigned char outlen;
++        
++        SSL_get0_next_proto_negotiated(inctx->ssl, &next_proto, &next_proto_len);
++        if (next_proto_len) {
++            ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, f->c,
++                          APLOGNO(02306) "SSL NPN negotiated protocol: '%.*s'",
++                          next_proto_len, (const char*)next_proto);
++
++            APR_ARRAY_PUSH(protos, char *) =
++              apr_pstrmemdup(f->c->pool, (const char *)next_proto, next_proto_len);
++            
++            if (modssl_select_protocol(inctx->ssl, f->c, sslconn, protos,
++                                       &out, &outlen) != SSL_TLSEXT_ERR_OK)
++                ap_log_cerror(APLOG_MARK, APLOG_INFO, 0, f->c,
++                              "SSL NPN negotiation failed");
++        }
++            
++        inctx->npn_finished = 1;
++    }
++#endif
++
+     if (is_init) {
+         /* protocol module needs to handshake before sending
+          * data to client (e.g. NNTP or FTP)
+@@ -1899,6 +1932,7 @@ static void ssl_io_input_add_filter(ssl_
+     inctx->block = APR_BLOCK_READ;
+     inctx->pool = c->pool;
+     inctx->filter_ctx = filter_ctx;
++    inctx->npn_finished = 0;
+ }
+ 
+ /* The request_rec pointer is passed in here only to ensure that the
+diff -uap httpd-2.4.18/modules/ssl/ssl_engine_kernel.c.r1332643+ httpd-2.4.18/modules/ssl/ssl_engine_kernel.c
+--- httpd-2.4.18/modules/ssl/ssl_engine_kernel.c.r1332643+
++++ httpd-2.4.18/modules/ssl/ssl_engine_kernel.c
+@@ -2297,6 +2297,142 @@ int ssl_callback_SessionTicket(SSL *ssl,
+ }
+ #endif /* HAVE_TLS_SESSION_TICKETS */
+ 
++#if defined(HAVE_TLS_NPN) || defined(HAVE_TLS_ALPN)
++int modssl_select_protocol(SSL *ssl, conn_rec *c, SSLConnRec *sslconn,
++			   apr_array_header_t *client_protos,
++			   const unsigned char **out, unsigned char *outlen)
++{
++    const char *proposed;
++    size_t len;
++
++    /* The order the callbacks are invoked from TLS extensions is, unfortunately
++     * not defined and older openssl versions do call ALPN selection before
++     * they callback the SNI. We need to make sure that we know which vhost
++     * we are dealing with so we respect the correct protocols.
++     */
++    init_vhost(c, ssl);
++    
++    proposed = ap_select_protocol(c, NULL, sslconn->server, client_protos);
++    if (!proposed) {
++        proposed = ap_get_protocol(c);
++    }
++    
++    len = strlen(proposed);
++    if (len > 255) {
++        ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(02840)
++                      "ALPN negotiated protocol name too long");
++        return SSL_TLSEXT_ERR_ALERT_FATAL;
++    }
++    *out = (const unsigned char *)proposed;
++    *outlen = (unsigned char)len;
++
++    ap_log_cerror(APLOG_MARK, APLOG_TRACE8, 0, c,
++		  "protocol switching from '%s' to '%s'",
++		  ap_get_protocol(c), proposed);
++        
++    if (strcmp(proposed, ap_get_protocol(c))) {
++        apr_status_t status;
++        
++        status = ap_switch_protocol(c, NULL, sslconn->server, proposed);
++        if (status != APR_SUCCESS) {
++            ap_log_cerror(APLOG_MARK, APLOG_ERR, status, c,
++                          APLOGNO(02908) "protocol switch to '%s' failed",
++                          proposed);
++            return SSL_TLSEXT_ERR_ALERT_FATAL;
++        }
++    }
++
++    return SSL_TLSEXT_ERR_OK;
++}
++#endif /* defined(HAVE_TLS_NPN) || defined(HAVE_TLS_ALPN) */
++
++#ifdef HAVE_TLS_NPN
++/*
++ * This callback function is executed when SSL needs to decide what protocols
++ * to advertise during Next Protocol Negotiation (NPN).  It must produce a
++ * string in wire format -- a sequence of length-prefixed strings -- indicating
++ * the advertised protocols.  Refer to SSL_CTX_set_next_protos_advertised_cb
++ * in OpenSSL for reference.
++ */
++int ssl_callback_AdvertiseNextProtos(SSL *ssl, const unsigned char **data_out,
++                                     unsigned int *size_out, void *arg)
++{
++    conn_rec *c = (conn_rec*)SSL_get_app_data(ssl);
++    SSLConnRec *sslconn = myConnConfig(c);
++    const apr_array_header_t *protos;
++    int num_protos;
++    unsigned int size;
++    int i;
++    unsigned char *data;
++    unsigned char *start;
++
++    *data_out = NULL;
++    *size_out = 0;
++
++    /* If the connection object is not available, or there are no
++       upgrades available, do nothing. */
++    if (!c || ap_get_protocol_upgrades(c, NULL, sslconn->server, 0, &protos)) {
++	return SSL_TLSEXT_ERR_NOACK;
++    }
++
++    num_protos = protos ? protos->nelts : 0;
++
++    if (num_protos == 0) {
++        return SSL_TLSEXT_ERR_NOACK;
++    }
++
++    /* We now have a list of null-terminated strings; we need to concatenate
++     * them together into a single string, where each protocol name is prefixed
++     * by its length.  First, calculate how long that string will be. */
++    size = 0;
++    for (i = 0; i < num_protos; ++i) {
++        const char *string = APR_ARRAY_IDX(protos, i, const char*);
++        unsigned int length = strlen(string);
++        /* If the protocol name is too long (the length must fit in one byte),
++         * then log an error and skip it. */
++        if (length > 255) {
++            ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(02307)
++                          "SSL NPN protocol name too long (length=%u): %s",
++                          length, string);
++            continue;
++        }
++        /* Leave room for the length prefix (one byte) plus the protocol name
++         * itself. */
++        size += 1 + length;
++    }
++
++    /* If there is nothing to advertise (either because no modules added
++     * anything to the protos array, or because all strings added to the array
++     * were skipped), then we're done. */
++    if (size == 0) {
++        return SSL_TLSEXT_ERR_OK;
++    }
++
++    /* Now we can build the string.  Copy each protocol name string into the
++     * larger string, prefixed by its length. */
++    data = apr_palloc(c->pool, size * sizeof(unsigned char));
++    start = data;
++    for (i = 0; i < num_protos; ++i) {
++        const char *string = APR_ARRAY_IDX(protos, i, const char*);
++        apr_size_t length = strlen(string);
++        if (length > 255)
++            continue;
++        *start = (unsigned char)length;
++        ++start;
++        memcpy(start, string, length * sizeof(unsigned char));
++        start += length;
++	ap_log_cerror(APLOG_MARK, APLOG_DEBUG, 0, c, 
++		      "SSL NPN protocol advertising: %s", string);
++    }
++
++    /* Success. */
++    *data_out = data;
++    *size_out = size;
++    return SSL_TLSEXT_ERR_OK;
++}
++
++#endif /* HAVE_TLS_NPN */
++
+ #ifdef HAVE_TLS_ALPN
+ 
+ /*
+@@ -2319,8 +2455,6 @@ int ssl_callback_alpn_select(SSL *ssl,
+     conn_rec *c = (conn_rec*)SSL_get_app_data(ssl);
+     SSLConnRec *sslconn = myConnConfig(c);
+     apr_array_header_t *client_protos;
+-    const char *proposed;
+-    size_t len;
+     int i;
+ 
+     /* If the connection object is not available,
+@@ -2350,40 +2484,7 @@ int ssl_callback_alpn_select(SSL *ssl,
+         i += plen;
+     }
+ 
+-    /* The order the callbacks are invoked from TLS extensions is, unfortunately
+-     * not defined and older openssl versions do call ALPN selection before
+-     * they callback the SNI. We need to make sure that we know which vhost
+-     * we are dealing with so we respect the correct protocols.
+-     */
+-    init_vhost(c, ssl);
+-    
+-    proposed = ap_select_protocol(c, NULL, sslconn->server, client_protos);
+-    if (!proposed) {
+-        proposed = ap_get_protocol(c);
+-    }
+-    
+-    len = strlen(proposed);
+-    if (len > 255) {
+-        ap_log_cerror(APLOG_MARK, APLOG_ERR, 0, c, APLOGNO(02840)
+-                      "ALPN negotiated protocol name too long");
+-        return SSL_TLSEXT_ERR_ALERT_FATAL;
+-    }
+-    *out = (const unsigned char *)proposed;
+-    *outlen = (unsigned char)len;
+-        
+-    if (strcmp(proposed, ap_get_protocol(c))) {
+-        apr_status_t status;
+-        
+-        status = ap_switch_protocol(c, NULL, sslconn->server, proposed);
+-        if (status != APR_SUCCESS) {
+-            ap_log_cerror(APLOG_MARK, APLOG_ERR, status, c,
+-                          APLOGNO(02908) "protocol switch to '%s' failed",
+-                          proposed);
+-            return SSL_TLSEXT_ERR_ALERT_FATAL;
+-        }
+-    }
+-
+-    return SSL_TLSEXT_ERR_OK;
++    return modssl_select_protocol(ssl, c, sslconn, client_protos, out, outlen);
+ }
+ #endif /* HAVE_TLS_ALPN */
+ 
+diff -uap httpd-2.4.18/modules/ssl/ssl_private.h.r1332643+ httpd-2.4.18/modules/ssl/ssl_private.h
+--- httpd-2.4.18/modules/ssl/ssl_private.h.r1332643+
++++ httpd-2.4.18/modules/ssl/ssl_private.h
+@@ -98,6 +98,8 @@
+ #include <openssl/x509_vfy.h>
+ #include <openssl/ocsp.h>
+ 
++#include "mod_ssl.h"
++
+ /* Avoid tripping over an engine build installed globally and detected
+  * when the user points at an explicit non-engine flavor of OpenSSL
+  */
+@@ -127,6 +129,11 @@
+ #define HAVE_FIPS
+ #endif
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG) \
++    && !defined(OPENSSL_NO_TLSEXT)
++#define HAVE_TLS_NPN
++#endif
++
+ #if defined(SSL_OP_NO_TLSv1_2)
+ #define HAVE_TLSV1_X
+ #endif
+@@ -816,6 +823,10 @@ int          ssl_callback_ServerNameIndi
+ int         ssl_callback_SessionTicket(SSL *, unsigned char *, unsigned char *,
+                                        EVP_CIPHER_CTX *, HMAC_CTX *, int);
+ #endif
++int ssl_callback_AdvertiseNextProtos(SSL *ssl, const unsigned char **data, unsigned int *len, void *arg);
++int modssl_select_protocol(SSL *ssl, conn_rec *c, SSLConnRec *sslconn,
++			   apr_array_header_t *client_protos,
++			   const unsigned char **out, unsigned char *outlen);
+ 
+ #ifdef HAVE_TLS_ALPN
+ int ssl_callback_alpn_select(SSL *ssl, const unsigned char **out,

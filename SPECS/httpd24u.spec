@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.20
-Release: 2.ius%{?dist}
+Release: 3.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -100,6 +100,7 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.1-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
+Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.10-mod_systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
@@ -318,6 +319,7 @@ interface for storing and accessing per-user session data.
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
+%patch28 -p1 -b .r1332643+
 %if 0%{?with_systemd}
 %patch29 -p1 -b .systemd
 %endif
@@ -835,6 +837,9 @@ done
 
 
 %changelog
+* Mon Jun 06 2016 Carl George <carl.george@rackspace.com> - 2.4.20-3.ius
+- Add patch for NPN support from httpd24-httpd SCL
+
 * Wed May 11 2016 Carl George <carl.george@rackspace.com> - 2.4.20-2.ius
 - Rename module subpackages from mod24u_* to httpd24u-mod_*
 - Remove httpd24u pre script (duplicate of httpd24u-filesystem's) (Fedora)
