@@ -47,8 +47,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.20
-Release: 3.ius%{?dist}
+Version: 2.4.23
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -837,6 +837,10 @@ done
 
 
 %changelog
+* Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
+- Latest upstream
+- update Source28 to include mod_proxy_hcheck
+
 * Mon Jun 06 2016 Carl George <carl.george@rackspace.com> - 2.4.20-3.ius
 - Add patch for NPN support from httpd24-httpd SCL
 
