@@ -469,7 +469,7 @@ sed -i '/^SSLSessionCache/s,/run,%{_rundir},' \
 
 # Split-out extra config shipped as default in conf.d:
 for f in autoindex; do
-  mv docs/conf/extra/httpd-${f}.conf \
+  install -m 644 docs/conf/extra/httpd-${f}.conf \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/${f}.conf
 done
 
@@ -690,14 +690,26 @@ if readelf -d $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so | grep TEXTREL; then
    : modules contain non-relocatable code
    exit 1
 fi
+set +x
+rv=0
 # Ensure every mod_* that's built is loaded.
 for f in $RPM_BUILD_ROOT%{_libdir}/httpd/modules/*.so; do
   m=${f##*/}
   if ! grep -q $m $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf; then
     echo ERROR: Module $m not configured.  Disable it, or load it.
-    exit 1
+    rv=1
   fi
 done
+# Ensure every loaded mod_* is actually built
+mods=`grep -h ^LoadModule $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/*.conf | sed 's,.*modules/,,'`
+for m in $mods; do
+  f=$RPM_BUILD_ROOT%{_libdir}/httpd/modules/${m}
+  if ! test -x $f; then
+    echo ERROR: Module $m is configured but not built.
+    rv=1
+  fi
+done
+exit $rv
 
 
 %files
@@ -839,6 +851,7 @@ done
 %changelog
 * Fri Jul 22 2016 Carl George <carl.george@rackspace.com> - 2.4.23-2.ius
 - Restore build of mod_proxy_fdpass (Fedora)
+- Improve check tests to catch configured-but-not-built modules (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
