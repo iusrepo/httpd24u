@@ -852,6 +852,7 @@ exit $rv
 * Fri Jul 22 2016 Carl George <carl.george@rackspace.com> - 2.4.23-2.ius
 - Restore build of mod_proxy_fdpass (Fedora)
 - Improve check tests to catch configured-but-not-built modules (Fedora)
+- Load mod_watchdog by default (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
