@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.23
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -395,7 +395,7 @@ export LYNX_PATH=/usr/bin/links
         --with-pcre \
         --enable-mods-shared=all \
         --enable-ssl --with-ssl --disable-distcache \
-        --enable-proxy \
+        --enable-proxy --enable-proxy-fdpass \
         --enable-cache \
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
@@ -837,6 +837,9 @@ done
 
 
 %changelog
+* Fri Jul 22 2016 Carl George <carl.george@rackspace.com> - 2.4.23-2.ius
+- Restore build of mod_proxy_fdpass (Fedora)
+
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
 - update Source28 to include mod_proxy_hcheck
