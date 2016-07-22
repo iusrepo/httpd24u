@@ -110,6 +110,7 @@ Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
+Patch100: httpd-2.4.18-CVE-2016-5387.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -332,6 +333,8 @@ interface for storing and accessing per-user session data.
 %patch55 -p1 -b .malformedhost
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
+
+%patch100 -p1 -b .cve5387
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -855,6 +858,7 @@ exit $rv
 - Re-enable mod_asis due to popular demand (Fedora)
 - Load mod_proxy_hcheck (Fedora)
 - Recommend use of "systemctl edit" in httpd.service (Fedora)
+- Add security fix for CVE-2016-5387 (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
