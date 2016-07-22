@@ -401,8 +401,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap --disable-file-cache \
-        --disable-asis
+        --disable-imagemap --disable-file-cache
         $*
 make %{?_smp_mflags}
 
@@ -853,6 +852,7 @@ exit $rv
 - Restore build of mod_proxy_fdpass (Fedora)
 - Improve check tests to catch configured-but-not-built modules (Fedora)
 - Load mod_watchdog by default (Fedora)
+- Re-enable mod_asis due to popular demand (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
