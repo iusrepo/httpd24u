@@ -853,6 +853,7 @@ exit $rv
 - Improve check tests to catch configured-but-not-built modules (Fedora)
 - Load mod_watchdog by default (Fedora)
 - Re-enable mod_asis due to popular demand (Fedora)
+- Load mod_proxy_hcheck (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
