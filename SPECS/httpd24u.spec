@@ -859,6 +859,7 @@ exit $rv
 - Load mod_proxy_hcheck (Fedora)
 - Recommend use of "systemctl edit" in httpd.service (Fedora)
 - Add security fix for CVE-2016-5387 (Fedora)
+- Use redirects for lang-specific /manual/ URLs (Fedora)
 
 * Tue Jul 05 2016 Ben Harper <ben.harper@rackspace.com> - 2.4.23-1.ius
 - Latest upstream
