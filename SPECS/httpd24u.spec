@@ -851,6 +851,9 @@ exit $rv
 
 
 %changelog
+* Fri Aug 26 2016 Ben Harper <ben.harper@rackspace.com> -  2.4.23-3.ius
+- update httpd.service to use /etc/sysconfig/httpd, see #11
+
 * Fri Jul 22 2016 Carl George <carl.george@rackspace.com> - 2.4.23-2.ius
 - Restore build of mod_proxy_fdpass (Fedora)
 - Improve check tests to catch configured-but-not-built modules (Fedora)

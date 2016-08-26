@@ -15,6 +15,7 @@ After=network.target remote-fs.target nss-lookup.target
 
 [Service]
 Type=notify
+EnvironmentFile=/etc/sysconfig/httpd
 Environment=LANG=C
 
 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND
