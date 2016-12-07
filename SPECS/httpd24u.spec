@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.23
-Release: 2.ius%{?dist}
+Release: 4.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -111,6 +111,7 @@ Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
 Patch100: httpd-2.4.18-CVE-2016-5387.patch
+Patch101: httpd-2.4.23-CVE-2016-8740.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -335,6 +336,7 @@ interface for storing and accessing per-user session data.
 %patch57 -p1 -b .sigint
 
 %patch100 -p1 -b .cve5387
+%patch101 -p1 -b .cve8740
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -851,6 +853,9 @@ exit $rv
 
 
 %changelog
+* Wed Dec 07 2016 Carl George <carl.george@rackspace.com> - 2.4.23-4.ius
+- Import Patch101 from Fedora to address CVE-2016-8740
+
 * Fri Aug 26 2016 Ben Harper <ben.harper@rackspace.com> -  2.4.23-3.ius
 - update httpd.service to use /etc/sysconfig/httpd, see #11
 
