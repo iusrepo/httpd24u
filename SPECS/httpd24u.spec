@@ -851,7 +851,7 @@ exit $rv
 
 
 %changelog
-* Tues Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
+* Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
 - Removing patch 101, it is merged upstream
 
