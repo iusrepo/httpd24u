@@ -106,7 +106,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
-Patch55: httpd-2.4.4-malformed-host.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
@@ -854,6 +853,7 @@ exit $rv
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
 - Removing patch 101, it is merged upstream
+- Removing patch 55, it is merged upstream
 
 * Wed Dec 07 2016 Carl George <carl.george@rackspace.com> - 2.4.23-4.ius
 - Import Patch101 from Fedora to address CVE-2016-8740
