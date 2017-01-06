@@ -48,7 +48,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.25
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -849,6 +849,9 @@ exit $rv
 
 
 %changelog
+* Fri Jan 06 2017 Carl George <carl.george@rackspace.com> - 2.4.25-2.ius
+- Disable mod_proxy_hcheck (rhbz#1410883)
+
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
 - Removing patch 101, it is merged upstream
