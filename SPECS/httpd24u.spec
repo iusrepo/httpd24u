@@ -664,7 +664,8 @@ fi
 %{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 2048 > %{sslkey} 2> /dev/null
 
 FQDN=`hostname`
-if [ "x${FQDN}" = "x" ]; then
+# A >59 char FQDN means "root@FQDN" exceeds 64-char max length for emailAddress
+if [ "x${FQDN}" = "x" -o ${#FQDN} -gt 59 ]; then
    FQDN=localhost.localdomain
 fi
 
@@ -850,6 +851,7 @@ exit $rv
 - Remove patch 100, fixed upstream
 - Require nghttp2 >= 1.5.0 (Fedora)
 - Use correct macros directory via %%rpmmacrodir (from epel-rpm-macros)
+- mod_ssl: use "localhost" in the dummy SSL cert if len(FQDN) > 59 chars (Fedora)
 
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
