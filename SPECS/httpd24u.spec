@@ -109,7 +109,6 @@ Patch34: httpd-2.4.17-socket-activation.patch
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
-Patch100: httpd-2.4.18-CVE-2016-5387.patch
 
 License: ASL 2.0
 Group: System Environment/Daemons
@@ -331,8 +330,6 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-
-%patch100 -p1 -b .cve5387
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -851,6 +848,7 @@ exit $rv
 %changelog
 * Fri Jan 06 2017 Carl George <carl.george@rackspace.com> - 2.4.25-2.ius
 - Disable mod_proxy_hcheck (rhbz#1410883)
+- Remove patch 100, fixed upstream
 
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
