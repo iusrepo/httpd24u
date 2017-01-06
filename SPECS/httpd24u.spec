@@ -27,13 +27,11 @@
 
 %if 0%{?rhel} >= 7
 %global with_systemd 1
-%global _macrosdir %{_rpmconfigdir}/macros.d
 %global _rundir /run
 %global suexec_uidmin 1000
 %global suexec_gidmin 1000
 %else
 %global with_systemd 0
-%global _macrosdir %{_sysconfdir}/rpm
 %global _rundir %{_localstatedir}/run
 %global suexec_uidmin 500
 %global suexec_gidmin 100
@@ -511,8 +509,8 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
-mkdir -p $RPM_BUILD_ROOT/%{_macrosdir}
-cat > $RPM_BUILD_ROOT/%{_macrosdir}/macros.httpd <<EOF
+mkdir -p $RPM_BUILD_ROOT/%{rpmmacrodir}
+cat > $RPM_BUILD_ROOT/%{rpmmacrodir}/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %%{_bindir}/apxs
 %%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
@@ -843,7 +841,7 @@ exit $rv
 %dir %{_libdir}/httpd/build
 %{_libdir}/httpd/build/*.mk
 %{_libdir}/httpd/build/*.sh
-%{_macrosdir}/macros.httpd
+%{rpmmacrodir}/macros.httpd
 
 
 %changelog
@@ -851,6 +849,7 @@ exit $rv
 - Disable mod_proxy_hcheck (rhbz#1410883)
 - Remove patch 100, fixed upstream
 - Require nghttp2 >= 1.5.0 (Fedora)
+- Use correct macros directory via %%rpmmacrodir (from epel-rpm-macros)
 
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
