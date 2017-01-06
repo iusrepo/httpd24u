@@ -126,6 +126,7 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
 Requires: %{name}-tools = %{version}-%{release}
 Requires: %{name}-filesystem = %{version}-%{release}
+Requires: nghttp2 >= 1.5.0
 Requires(pre): %{name}-filesystem = %{version}-%{release}
 %if 0%{?with_systemd}
 Requires(preun): systemd-units
@@ -849,6 +850,7 @@ exit $rv
 * Fri Jan 06 2017 Carl George <carl.george@rackspace.com> - 2.4.25-2.ius
 - Disable mod_proxy_hcheck (rhbz#1410883)
 - Remove patch 100, fixed upstream
+- Require nghttp2 >= 1.5.0 (Fedora)
 
 * Tue Dec 20 2016 Brandon Tomlinson <brandon.tomlinson@rackspace.com> - 2.4.25-1.ius
 - Latest upstream
