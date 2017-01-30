@@ -46,7 +46,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.25
-Release: 2.ius%{?dist}
+Release: 3.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -106,6 +106,7 @@ Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
+Patch58: httpd-2.4.25-r1778319+.patch
 # Security fixes
 
 License: ASL 2.0
@@ -329,6 +330,7 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
+%patch58 -p1 -b .r1778319+
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -846,6 +848,10 @@ exit $rv
 
 
 %changelog
+* Mon Jan 30 2017 Carl George <carl.george@rackspace.com> - 2.4.25-3.ius
+- mod_watchdog: restrict thread lifetime (#1410883) (Fedora)
+- Re-enable mod_proxy_hcheck
+
 * Fri Jan 06 2017 Carl George <carl.george@rackspace.com> - 2.4.25-2.ius
 - Disable mod_proxy_hcheck (rhbz#1410883)
 - Remove patch 100, fixed upstream
