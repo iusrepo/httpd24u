@@ -12,7 +12,6 @@
 %define docroot /var/www
 %define suexec_caller apache
 %define mmn 20120211
-%define oldmmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 
 %if 0%{?fedora}
@@ -122,7 +121,7 @@ Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}, httpd-mmn = %{oldmmnisa}
+Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: %{name}-tools = %{version}-%{release}
 Requires: %{name}-filesystem = %{version}-%{release}
 Requires: nghttp2 >= 1.5.0
@@ -851,6 +850,7 @@ exit $rv
 * Mon Jan 30 2017 Carl George <carl.george@rackspace.com> - 2.4.25-3.ius
 - mod_watchdog: restrict thread lifetime (#1410883) (Fedora)
 - Re-enable mod_proxy_hcheck
+- Remove unneeded oldmmnisa macro
 
 * Fri Jan 06 2017 Carl George <carl.george@rackspace.com> - 2.4.25-2.ius
 - Disable mod_proxy_hcheck (rhbz#1410883)
