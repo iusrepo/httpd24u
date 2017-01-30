@@ -25,13 +25,11 @@
 %endif # fedora
 
 %if 0%{?rhel} >= 7
-%global with_systemd 1
-%global _rundir /run
+%bcond_without systemd
 %global suexec_uidmin 1000
 %global suexec_gidmin 1000
 %else
-%global with_systemd 0
-%global _rundir %{_localstatedir}/run
+%bcond_with systemd
 %global suexec_uidmin 500
 %global suexec_gidmin 100
 %endif
@@ -114,9 +112,7 @@ BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
 BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: libnghttp2-devel
-%if 0%{?with_systemd}
-BuildRequires: systemd-devel
-%endif
+%{?with_systemd:BuildRequires: systemd-devel}
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
 Obsoletes: httpd-suexec
 Provides: webserver
@@ -126,7 +122,7 @@ Requires: %{name}-tools = %{version}-%{release}
 Requires: %{name}-filesystem = %{version}-%{release}
 Requires: nghttp2 >= 1.5.0
 Requires(pre): %{name}-filesystem = %{version}-%{release}
-%if 0%{?with_systemd}
+%if %{with systemd}
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 Requires(post): systemd-units
@@ -138,9 +134,6 @@ Requires(post): chkconfig
 # IUS-isms
 Provides: %{real_name} = %{version}-%{release}
 Provides: %{real_name}%{?_isa} = %{version}-%{release}
-# not sure on this one, it is provided by the stock el6 package but not the
-# el7 or fedora ones
-#Provides: config(%{real_name}) = %{version}-%{release}
 Conflicts: %{real_name} < %{version}
 
 
@@ -298,9 +291,7 @@ interface for storing and accessing per-user session data.
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
-%if 0%{?with_systemd}
-%patch6 -p1 -b .apctlsystemd
-%endif
+%{?with_systemd:%patch6 -p1 -b .apctlsystemd}
 
 %if 0%{?rhel} >= 7
 %patch7 -p1 -b .layout
@@ -308,9 +299,7 @@ interface for storing and accessing per-user session data.
 %patch8 -p1 -b .layout
 %endif
 
-%if 0%{?with_systemd}
-%patch19 -p1 -b .detectsystemd
-%endif
+%{?with_systemd:%patch19 -p1 -b .detectsystemd}
 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -318,14 +307,10 @@ interface for storing and accessing per-user session data.
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch28 -p1 -b .r1332643+
-%if 0%{?with_systemd}
-%patch29 -p1 -b .systemd
-%endif
+%{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
-%if 0%{?with_systemd}
-%patch34 -p1 -b .socketactivation
-%endif
+%{?with_systemd:%patch34 -p1 -b .socketactivation}
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
@@ -407,7 +392,7 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 # Install systemd service files
 mkdir -p $RPM_BUILD_ROOT%{_unitdir}
 for s in httpd.service htcacheclean.service httpd.socket; do
@@ -432,17 +417,12 @@ install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
          00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
-         01-ldap.conf 01-session.conf 00-optional.conf ; do
+         01-ldap.conf %{?with_systemd:00-systemd.conf} 01-session.conf 00-optional.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
 
-%if 0%{?with_systemd}
-for f in 00-systemd.conf; do
-  install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
-done
-
+%if %{with systemd}
 # install systemd override drop directory
 # Web application packages can drop snippets into this location if
 # they need ExecStart[pre|post].
@@ -458,9 +438,9 @@ for f in welcome.conf ssl.conf manual.conf userdir.conf; do
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
-%if ! 0%{?with_systemd}
+%if %{without systemd}
 # el6 should use /var/run, not /run
-sed -i '/^SSLSessionCache/s,/run,%{_rundir},' \
+sed -i '/^SSLSessionCache/s,/run,/var/run,' \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/ssl.conf
 %endif
 
@@ -483,7 +463,7 @@ for s in httpd htcacheclean; do
                     $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/${s}
 done
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 # tmpfiles.d configuration
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d 
 install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
@@ -492,7 +472,7 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
 
 # Other directories
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav \
-         $RPM_BUILD_ROOT/%{_rundir}/httpd/htcacheclean
+         $RPM_BUILD_ROOT%{?el6:%{_localstatedir}}/run/httpd/htcacheclean
 
 # Substitute in defaults which are usually done (badly) by "make install"
 sed -i \
@@ -551,7 +531,7 @@ ln -s ../../pixmaps/poweredby.png \
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s %{_rundir}/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s %{?el6:%{_localstatedir}}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install http-ssl-pass-dialog
@@ -559,7 +539,7 @@ mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 install -m755 $RPM_SOURCE_DIR/httpd-ssl-pass-dialog \
         $RPM_BUILD_ROOT%{_libexecdir}/httpd-ssl-pass-dialog
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 # Install action scripts
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}/initscripts/legacy-actions/httpd
 for f in graceful configtest; do
@@ -570,7 +550,7 @@ done
 
 # Install logrotate config
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-%if 0%{?with_systemd}
+%if %{with systemd}
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
         $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 %else
@@ -584,7 +564,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/%{_rundir}/httpd/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|%{?el6:%{_localstatedir}}/run/httpd/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -619,7 +599,7 @@ getent passwd apache >/dev/null || \
 exit 0
 
 %post
-%if 0%{?with_systemd}
+%if %{with systemd}
 %systemd_post httpd.service htcacheclean.service httpd.socket
 %else
 /sbin/chkconfig --add httpd
@@ -627,7 +607,7 @@ exit 0
 %endif
 
 %preun
-%if 0%{?with_systemd}
+%if %{with systemd}
 %systemd_preun httpd.service htcacheclean.service httpd.socket
 %else
 if [ $1 = 0 ]; then
@@ -638,14 +618,14 @@ if [ $1 = 0 ]; then
 fi
 %endif
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 %postun
 %systemd_postun
 %endif
 
 %posttrans
 test -f /etc/sysconfig/httpd-disable-posttrans || \
-%if 0%{?with_systemd}
+%if %{with systemd}
   /bin/systemctl try-restart httpd.service htcacheclean.service >/dev/null 2>&1 || :
 %else
   /sbin/service httpd condrestart >/dev/null 2>&1 || :
@@ -707,6 +687,7 @@ for m in $mods; do
     rv=1
   fi
 done
+set -x
 exit $rv
 
 
@@ -736,7 +717,7 @@ exit $rv
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
-%if 0%{?with_systemd}
+%if %{with systemd}
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
 %{_libexecdir}/initscripts/legacy-actions/httpd/*
@@ -771,8 +752,8 @@ exit $rv
 %{contentdir}/error/include/*.html
 %{contentdir}/noindex/index.html
 
-%attr(0710,root,apache) %dir %{_rundir}/httpd
-%attr(0700,apache,apache) %dir %{_rundir}/httpd/htcacheclean
+%attr(0710,root,apache) %dir %{?el6:%{_localstatedir}}/run/httpd
+%attr(0700,apache,apache) %dir %{?el6:%{_localstatedir}}/run/httpd/htcacheclean
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/httpd
@@ -780,7 +761,7 @@ exit $rv
 
 %{_mandir}/man8/*
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
 %attr(755,root,root) %dir %{_unitdir}/httpd.service.d
@@ -818,9 +799,7 @@ exit $rv
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/ssl.conf
 %attr(0700,apache,root) %dir %{_localstatedir}/cache/httpd/ssl
 %{_libexecdir}/httpd-ssl-pass-dialog
-%if 0%{?with_systemd}
-%{_unitdir}/httpd.socket.d/10-listen443.conf
-%endif
+%{?with_systemd:%{_unitdir}/httpd.socket.d/10-listen443.conf}
 
 %files mod_proxy_html
 %{_libdir}/httpd/modules/mod_proxy_html.so
