@@ -43,7 +43,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.25
-Release: 3.ius%{?dist}
+Release: 4.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -826,6 +826,10 @@ exit $rv
 
 
 %changelog
+* Mon May 22 2017 Carl George <carl.george@rackspace.com> - 2.4.25-4.ius
+- Disable SSLv3
+- Synch ssl.conf with upstream
+
 * Mon Jan 30 2017 Carl George <carl.george@rackspace.com> - 2.4.25-3.ius
 - mod_watchdog: restrict thread lifetime (#1410883) (Fedora)
 - Re-enable mod_proxy_hcheck
