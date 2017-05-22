@@ -828,7 +828,7 @@ exit $rv
 %changelog
 * Mon May 22 2017 Carl George <carl.george@rackspace.com> - 2.4.25-4.ius
 - Disable SSLv3
-- Synch ssl.conf with upstream
+- Sync ssl.conf with upstream
 
 * Mon Jan 30 2017 Carl George <carl.george@rackspace.com> - 2.4.25-3.ius
 - mod_watchdog: restrict thread lifetime (#1410883) (Fedora)
