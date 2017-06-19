@@ -42,8 +42,8 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.25
-Release: 4.ius%{?dist}
+Version: 2.4.26
+Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -77,6 +77,7 @@ Source29: httpd.logrotate-legacy
 # Documentation
 Source30: README.confd
 Source31: README.confmod
+Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
 Source42: htcacheclean.init
@@ -88,11 +89,11 @@ Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch7: httpd-2.4.3-layout.patch
 Patch8: httpd-2.4.3-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.10-detect-systemd.patch
+Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.4-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.1-selinux.patch
+Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.6-r1332643+.patch
@@ -103,7 +104,6 @@ Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
 Patch57: httpd-2.4.10-sigint.patch
-Patch58: httpd-2.4.25-r1778319+.patch
 # Security fixes
 
 License: ASL 2.0
@@ -314,7 +314,6 @@ interface for storing and accessing per-user session data.
 
 %patch56 -p1 -b .uniqueid
 %patch57 -p1 -b .sigint
-%patch58 -p1 -b .r1778319+
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -333,6 +332,8 @@ if test "x${vmmn}" != "x%{mmn}"; then
    : Update the mmn macro and rebuild.
    exit 1
 fi
+
+xmlto man $RPM_SOURCE_DIR/httpd.service.xml
 
 : Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
 
@@ -557,6 +558,10 @@ install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate-legacy \
         $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 %endif
+
+# Install systemd service man pages
+install -m 644 -p httpd.service.8 httpd.socket.8 \
+        $RPM_BUILD_ROOT%{_mandir}/man8
 
 # fix man page paths
 sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
@@ -826,6 +831,17 @@ exit $rv
 
 
 %changelog
+* Mon Jun 19 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.26-1.ius
+- Latest upstream
+- update Patch19 and Patch25 from Fedora
+  http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=59afc1533e764a1108136ae1aab3671632aa3797
+- refresh Patch28
+- update Patch57 from Fedora
+  http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=fd6452a0f2d4aa85e5f8e757be7f0b89511cdf0e
+- update Source6 and Source27 and add latest version of Source32 from Fedora
+  http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=fce414a1c1f39ab4631e9747b212e037276d295d
+- remove Patch58, fixed upstream
+
 * Mon May 22 2017 Carl George <carl.george@rackspace.com> - 2.4.25-4.ius
 - Disable SSLv3
 - Sync ssl.conf with upstream

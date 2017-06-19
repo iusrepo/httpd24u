@@ -96,10 +96,9 @@ diff -uap httpd-2.4.18/modules/ssl/ssl_engine_init.c.r1332643+ httpd-2.4.18/modu
  }
  
  static apr_status_t ssl_init_ctx_verify(server_rec *s,
-diff -uap httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+ httpd-2.4.18/modules/ssl/ssl_engine_io.c
---- httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+
-+++ httpd-2.4.18/modules/ssl/ssl_engine_io.c
-@@ -319,6 +319,7 @@ typedef struct {
+--- httpd-2.4.26/modules/ssl/ssl_engine_io.c	2017-05-30 12:26:05.000000000 +0000
++++ httpd-2.4.26/modules/ssl/ssl_engine_io.c.patch	2017-06-19 16:37:00.387134234 +0000
+@@ -317,6 +317,7 @@ typedef struct {
      apr_pool_t *pool;
      char buffer[AP_IOBUFSIZE];
      ssl_filter_ctx_t *filter_ctx;
@@ -107,10 +106,10 @@ diff -uap httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+ httpd-2.4.18/module
  } bio_filter_in_ctx_t;
  
  /*
-@@ -1377,6 +1378,38 @@ static apr_status_t ssl_io_filter_input(
-         return ssl_io_filter_error(f, bb, status, is_init);
+@@ -1516,6 +1517,37 @@ static apr_status_t ssl_io_filter_input(
+     if ((status = ssl_io_filter_handshake(inctx->filter_ctx)) != APR_SUCCESS) {
+         return ssl_io_filter_error(inctx, bb, status, is_init);
      }
- 
 +#ifdef HAVE_TLS_NPN
 +    /* By this point, Next Protocol Negotiation (NPN) should be completed (if
 +     * our version of OpenSSL supports it).  If we haven't already, find out
@@ -123,7 +122,7 @@ diff -uap httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+ httpd-2.4.18/module
 +        unsigned next_proto_len = 0;
 +        const unsigned char *out;
 +        unsigned char outlen;
-+        
++
 +        SSL_get0_next_proto_negotiated(inctx->ssl, &next_proto, &next_proto_len);
 +        if (next_proto_len) {
 +            ap_log_cerror(APLOG_MARK, APLOG_TRACE1, 0, f->c,
@@ -132,21 +131,20 @@ diff -uap httpd-2.4.18/modules/ssl/ssl_engine_io.c.r1332643+ httpd-2.4.18/module
 +
 +            APR_ARRAY_PUSH(protos, char *) =
 +              apr_pstrmemdup(f->c->pool, (const char *)next_proto, next_proto_len);
-+            
++
 +            if (modssl_select_protocol(inctx->ssl, f->c, sslconn, protos,
 +                                       &out, &outlen) != SSL_TLSEXT_ERR_OK)
 +                ap_log_cerror(APLOG_MARK, APLOG_INFO, 0, f->c,
 +                              "SSL NPN negotiation failed");
 +        }
-+            
++
 +        inctx->npn_finished = 1;
 +    }
 +#endif
-+
+ 
      if (is_init) {
          /* protocol module needs to handshake before sending
-          * data to client (e.g. NNTP or FTP)
-@@ -1899,6 +1932,7 @@ static void ssl_io_input_add_filter(ssl_
+@@ -2041,6 +2073,7 @@ static void ssl_io_input_add_filter(ssl_
      inctx->block = APR_BLOCK_READ;
      inctx->pool = c->pool;
      inctx->filter_ctx = filter_ctx;

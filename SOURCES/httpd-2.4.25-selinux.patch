@@ -11,7 +11,7 @@ Upstream-Status: unlikely to be any interest in this upstream
  
 +AC_CHECK_LIB(selinux, is_selinux_enabled, [
 +   AC_DEFINE(HAVE_SELINUX, 1, [Defined if SELinux is supported])
-+   APR_ADDTO(AP_LIBS, [-lselinux])
++   APR_ADDTO(HTTPD_LIBS, [-lselinux])
 +])
 +
  AC_CACHE_CHECK([for gettid()], ac_cv_gettid,

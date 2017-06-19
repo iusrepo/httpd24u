@@ -1,10 +1,13 @@
-# It is not recommended to modify this file in-place, because it will be
-# overwritten during package upgrades.  If you want to customize, the best
-# way is to use the "systemctl edit" command to create an override unit.
+# See httpd.service(8) for more information on using the httpd service.
 
-# For example, to pass additional options (for instance, -D
-# definitions) to the httpd binary at startup, create an override unit
-# (as is done by systemctl edit) and enter the following:
+# Modifying this file in-place is not recommended, because changes
+# will be overwritten during package upgrades.  If you want to
+# customize the behaviour, the best way is to use "systemctl edit"
+# command to create an override unit.
+
+# For example, to pass additional options (such as -D definitions) to
+# the httpd binary at startup, create an override unit (as is done by
+# systemctl edit) and enter the following:
 
 #	[Service]
 #	Environment=OPTIONS=-DMY_DEFINE
@@ -12,6 +15,7 @@
 [Unit]
 Description=The Apache HTTP Server
 After=network.target remote-fs.target nss-lookup.target
+Documentation=man:httpd.service(8)
 
 [Service]
 Type=notify
