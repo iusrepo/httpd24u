@@ -833,7 +833,7 @@ exit $rv
 %changelog
 * Mon Jun 19 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.26-1.ius
 - Latest upstream
-- update Patch19 and Patch25 from Fedora
+- update Patch19 and Patch25 from Fedora along with tweaks for better separation of systemd and selinux to build on el6
   http://pkgs.fedoraproject.org/cgit/rpms/httpd.git/commit/?id=59afc1533e764a1108136ae1aab3671632aa3797
 - refresh Patch28
 - update Patch57 from Fedora

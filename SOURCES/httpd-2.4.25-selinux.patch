@@ -11,7 +11,7 @@ Upstream-Status: unlikely to be any interest in this upstream
  
 +AC_CHECK_LIB(selinux, is_selinux_enabled, [
 +   AC_DEFINE(HAVE_SELINUX, 1, [Defined if SELinux is supported])
-+   APR_ADDTO(HTTPD_LIBS, [-lselinux])
++   APR_ADDTO(AP_LIBS, [-lselinux])
 +])
 +
  AC_CACHE_CHECK([for gettid()], ac_cv_gettid,
@@ -59,3 +59,33 @@ Upstream-Status: unlikely to be any interest in this upstream
      return OK;
  }
  
+diff -uap httpd-2.4.25/configure.in.detectsystemd httpd-2.4.25/configure.in
+--- httpd-2.4.25/configure.in.detectsystemd
++++ httpd-2.4.25/configure.in
+@@ -234,6 +234,7 @@
+   AC_MSG_NOTICE([Using external PCRE library from $PCRE_CONFIG])
+   APR_ADDTO(PCRE_INCLUDES, [`$PCRE_CONFIG --cflags`])
+   APR_ADDTO(PCRE_LIBS, [`$PCRE_CONFIG --libs`])
++  APR_ADDTO(HTTPD_LIBS, [\$(PCRE_LIBS)])
+ else
+   AC_MSG_ERROR([pcre-config for libpcre not found. PCRE is required and available from http://pcre.org/])
+ fi
+@@ -668,6 +676,7 @@
+ APACHE_SUBST(BUILTIN_LIBS)
+ APACHE_SUBST(SHLIBPATH_VAR)
+ APACHE_SUBST(OS_SPECIFIC_VARS)
++APACHE_SUBST(HTTPD_LIBS)
+ 
+ PRE_SHARED_CMDS='echo ""'
+ POST_SHARED_CMDS='echo ""'
+--- httpd-2.4.25/Makefile.in.detectsystemd
++++ httpd-2.4.25/Makefile.in
+@@ -4,7 +4,7 @@
+ 
+ PROGRAM_NAME         = $(progname)
+ PROGRAM_SOURCES      = modules.c
+-PROGRAM_LDADD        = buildmark.o $(HTTPD_LDFLAGS) $(PROGRAM_DEPENDENCIES) $(PCRE_LIBS) $(EXTRA_LIBS) $(AP_LIBS) $(LIBS)
++PROGRAM_LDADD        = buildmark.o $(HTTPD_LDFLAGS) $(PROGRAM_DEPENDENCIES) $(HTTPD_LIBS) $(EXTRA_LIBS) $(AP_LIBS) $(LIBS)
+ PROGRAM_PRELINK      = $(COMPILE) -c $(top_srcdir)/server/buildmark.c
+ PROGRAM_DEPENDENCIES = \
+   server/libmain.la \
