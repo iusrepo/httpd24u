@@ -42,7 +42,7 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.26
+Version: 2.4.27
 Release: 1.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -831,6 +831,9 @@ exit $rv
 
 
 %changelog
+* Mon Jul 10 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.27-1.ius
+- Latest upstream
+
 * Mon Jun 19 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.26-1.ius
 - Latest upstream
 - update Patch19 and Patch25 from Fedora along with tweaks for better separation of systemd and selinux to build on el6
