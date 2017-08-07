@@ -43,7 +43,7 @@
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
 Version: 2.4.27
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: http://httpd.apache.org/
 Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -831,6 +831,9 @@ exit $rv
 
 
 %changelog
+* Mon Aug 07 2017 Carl George <carl@george.computer> - 2.4.27-2.ius
+- Rebuild for EL7.4's openssl-1.0.2k
+
 * Mon Jul 10 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.27-1.ius
 - Latest upstream
 
