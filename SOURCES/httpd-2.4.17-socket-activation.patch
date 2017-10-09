@@ -1,5 +1,5 @@
 diff --git a/server/listen.c b/server/listen.c
-index 1d9be83..f5f7754 100644
+index a8e9e6f..1a6c1d3 100644
 --- a/server/listen.c
 +++ b/server/listen.c
 @@ -34,6 +34,10 @@
@@ -100,11 +100,10 @@ index 1d9be83..f5f7754 100644
      }
  
  #ifdef WIN32
-@@ -277,6 +286,124 @@ static apr_status_t close_listeners_on_exec(void *v)
-     return APR_SUCCESS;
+@@ -315,6 +324,123 @@ static int find_listeners(ap_listen_rec **from, ap_listen_rec **to,
+     return found;
  }
  
-+
 +#ifdef HAVE_SYSTEMD
 +
 +static int find_systemd_socket(process_rec * process, apr_port_t port) {
@@ -222,10 +221,10 @@ index 1d9be83..f5f7754 100644
 +
 +#endif /* HAVE_SYSTEMD */
 +
- static const char *alloc_listener(process_rec *process, char *addr,
+ static const char *alloc_listener(process_rec *process, const char *addr,
                                    apr_port_t port, const char* proto,
                                    void *slave)
-@@ -479,7 +606,7 @@ static int open_listeners(apr_pool_t *pool)
+@@ -495,7 +621,7 @@ static int open_listeners(apr_pool_t *pool)
                  }
              }
  #endif
@@ -234,7 +233,7 @@ index 1d9be83..f5f7754 100644
                  ++num_open;
              }
              else {
-@@ -591,8 +718,28 @@ AP_DECLARE(int) ap_setup_listeners(server_rec *s)
+@@ -607,8 +733,28 @@ AP_DECLARE(int) ap_setup_listeners(server_rec *s)
          }
      }
  
@@ -265,7 +264,7 @@ index 1d9be83..f5f7754 100644
      }
  
      for (lr = ap_listeners; lr; lr = lr->next) {
-@@ -682,7 +829,7 @@ AP_DECLARE(apr_status_t) ap_duplicate_listeners(apr_pool_t *p, server_rec *s,
+@@ -698,7 +844,7 @@ AP_DECLARE(apr_status_t) ap_duplicate_listeners(apr_pool_t *p, server_rec *s,
                              duplr->bind_addr);
                  return stat;
              }
@@ -274,7 +273,7 @@ index 1d9be83..f5f7754 100644
  #if AP_NONBLOCK_WHEN_MULTI_LISTEN
              use_nonblock = (ap_listeners && ap_listeners->next);
              stat = apr_socket_opt_set(duplr->sd, APR_SO_NONBLOCK, use_nonblock);
-@@ -809,6 +956,11 @@ AP_DECLARE_NONSTD(const char *) ap_set_listener(cmd_parms *cmd, void *dummy,
+@@ -825,6 +971,11 @@ AP_DECLARE_NONSTD(const char *) ap_set_listener(cmd_parms *cmd, void *dummy,
      if (argc < 1 || argc > 2) {
          return "Listen requires 1 or 2 arguments.";
      }
@@ -286,7 +285,7 @@ index 1d9be83..f5f7754 100644
  
      rv = apr_parse_addr_port(&host, &scope_id, &port, argv[0], cmd->pool);
      if (rv != APR_SUCCESS) {
-@@ -840,6 +992,12 @@ AP_DECLARE_NONSTD(const char *) ap_set_listener(cmd_parms *cmd, void *dummy,
+@@ -856,6 +1007,12 @@ AP_DECLARE_NONSTD(const char *) ap_set_listener(cmd_parms *cmd, void *dummy,
          ap_str_tolower(proto);
      }
  

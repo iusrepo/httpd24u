@@ -1,8 +1,10 @@
-diff --git a/modules/arch/unix/config5.m4 b/modules/arch/unix/config5.m4
-index 77027a8..7a13d5a 100644
---- a/modules/arch/unix/config5.m4
-+++ b/modules/arch/unix/config5.m4
-@@ -18,6 +18,16 @@ APACHE_MODULE(privileges, Per-virtualhost Unix UserIDs and enhanced security for
+diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
+diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
+diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
+diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
+--- httpd-2.4.27/modules/arch/unix/config5.m4.systemd
++++ httpd-2.4.27/modules/arch/unix/config5.m4
+@@ -18,6 +18,16 @@
    fi
  ])
  
@@ -19,12 +21,10 @@ index 77027a8..7a13d5a 100644
  APR_ADDTO(INCLUDES, [-I\$(top_srcdir)/$modpath_current])
  
  APACHE_MODPATH_FINISH
-diff --git a/modules/arch/unix/mod_systemd.c b/modules/arch/unix/mod_systemd.c
-new file mode 100644
-index 0000000..5381c98
---- /dev/null
-+++ b/modules/arch/unix/mod_systemd.c
-@@ -0,0 +1,145 @@
+diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modules/arch/unix/mod_systemd.c
+--- httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd
++++ httpd-2.4.27/modules/arch/unix/mod_systemd.c
+@@ -0,0 +1,161 @@
 +/* Licensed to the Apache Software Foundation (ASF) under one or more
 + * contributor license agreements.  See the NOTICE file distributed with
 + * this work for additional information regarding copyright ownership.
@@ -66,11 +66,20 @@ index 0000000..5381c98
 +static unsigned long bytes_served;
 +static pid_t mainpid;
 +
++static int systemd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
++                              apr_pool_t *ptemp)
++{
++    sd_notify(0,
++              "RELOADING=1\n"
++              "STATUS=Reading configuration...\n");
++    ap_extended_status = 1;
++    return OK;
++}
++
 +static int systemd_pre_mpm(apr_pool_t *p, ap_scoreboard_e sb_type)
 +{
 +    int rv;
 +
-+    ap_extended_status = 1;
 +    mainpid = getpid();
 +
 +    rv = sd_notifyf(0, "READY=1\n"
@@ -91,6 +100,11 @@ index 0000000..5381c98
 +    char bps[5];
 +    int rv;
 +
++    if (!ap_extended_status) {
++        /* Nothing useful to report if ExtendedStatus disabled. */
++        return DECLINED;
++    }
++    
 +    ap_get_sload(&sload);
 +    /* up_time in seconds */
 +    up_time = (apr_uint32_t) apr_time_sec(apr_time_now() -
@@ -136,6 +150,8 @@ index 0000000..5381c98
 +
 +static void systemd_register_hooks(apr_pool_t *p)
 +{
++    /* Enable ap_extended_status. */
++    ap_hook_pre_config(systemd_pre_config, NULL, NULL, APR_HOOK_LAST);
 +    /* We know the PID in this hook ... */
 +    ap_hook_pre_mpm(systemd_pre_mpm, NULL, NULL, APR_HOOK_LAST);
 +    /* Used to update httpd's status line using sd_notifyf */

@@ -143,6 +143,11 @@ Wants=network-online.target</programlisting>
       which terminates the server only once active connections have
       been processed.</para>
 
+      <para>To "ungracefully" stop the server without waiting for
+      requests to complete, use <command>systemctl kill
+      --kill-who=main httpd</command>; similarly to "ungracefully"
+      reload the configuration, use <command>systemctl kill
+      --kill-who=main --signal=HUP httpd</command>.</para>
     </refsect2>
 
     <refsect2>

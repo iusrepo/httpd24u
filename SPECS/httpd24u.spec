@@ -42,10 +42,10 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.27
-Release: 2.ius%{?dist}
-URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
+Version: 2.4.28
+Release: 1.ius%{?dist}
+URL: https://httpd.apache.org/
+Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
 Source3: httpd.sysconf
 Source4: httpd-ssl-pass-dialog
@@ -97,13 +97,12 @@ Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.6-r1332643+.patch
-Patch29: httpd-2.4.10-mod_systemd.patch
+Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
 Patch56: httpd-2.4.4-mod_unique_id.patch
-Patch57: httpd-2.4.10-sigint.patch
 # Security fixes
 
 License: ASL 2.0
@@ -313,7 +312,6 @@ interface for storing and accessing per-user session data.
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 
 %patch56 -p1 -b .uniqueid
-%patch57 -p1 -b .sigint
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -769,8 +767,6 @@ exit $rv
 %if %{with systemd}
 %{_unitdir}/*.service
 %{_unitdir}/*.socket
-%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
-%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
 %else
 # sysvinit
 %{_sysconfdir}/rc.d/init.d/httpd
@@ -786,6 +782,10 @@ exit $rv
 %dir %{docroot}/html
 %dir %{contentdir}
 %dir %{contentdir}/icons
+%if %{with systemd}
+%attr(755,root,root) %dir %{_unitdir}/httpd.service.d
+%attr(755,root,root) %dir %{_unitdir}/httpd.socket.d
+%endif
 
 %files tools
 %{_bindir}/*
@@ -831,6 +831,18 @@ exit $rv
 
 
 %changelog
+* Wed Oct 04 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.28-1.ius
+- Latest upstream
+- Remove Patch57, fixed upsteam
+- Update Source29 from Fedora:
+  https://src.fedoraproject.org/rpms/httpd/c/adcaa3428979e75ed3cc4e3a942842be7b16cfa2
+- use https for URL and Source0 from Fedora:
+  https://src.fedoraproject.org/rpms/httpd/c/ddabcffa42aeee042fbe2af37931158ec539cb80
+- move service.d and socket.d folders to -filesystem from Fedora:
+  https://src.fedoraproject.org/rpms/httpd/c/a7a88382f7efa6154d762b7a7a22fc7e4d057adb
+- update Source32 from Fedora:
+  https://src.fedoraproject.org/rpms/httpd/c/870b71c4f0c8e363d0e46c365f5d85fa76b62803
+
 * Mon Aug 07 2017 Carl George <carl@george.computer> - 2.4.27-2.ius
 - Rebuild for EL7.4's openssl-1.0.2k
 
