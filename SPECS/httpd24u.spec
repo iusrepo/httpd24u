@@ -42,7 +42,7 @@
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
-Version: 2.4.28
+Version: 2.4.29
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -102,7 +102,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 # Bug fixes
-Patch56: httpd-2.4.4-mod_unique_id.patch
 # Security fixes
 
 License: ASL 2.0
@@ -310,8 +309,6 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %patch31 -p1 -b .sslmultiproxy
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
-
-%patch56 -p1 -b .uniqueid
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -831,6 +828,9 @@ exit $rv
 
 
 %changelog
+* Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
+- Latest upstream
+
 * Wed Oct 04 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.28-1.ius
 - Latest upstream
 - Remove Patch57, fixed upsteam
