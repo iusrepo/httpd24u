@@ -35,10 +35,8 @@
 %endif
 
 # Drop automatic provides for module DSOs
-%{?filter_setup:
-%filter_provides_in %{_libdir}/httpd/modules/.*\.so$
-%filter_setup
-}
+%{?filter_provides_in:%filter_provides_in %{_libdir}/httpd/modules/.*\.so$}
+%{?filter_setup}
 
 Summary: Apache HTTP Server
 Name: %{real_name}%{ius_suffix}
@@ -112,7 +110,6 @@ BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 
 BuildRequires: libnghttp2-devel
 %{?with_systemd:BuildRequires: systemd-devel}
 Requires: /etc/mime.types, system-logos >= 7.92.1-1
-Obsoletes: httpd-suexec
 Provides: webserver
 Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
@@ -143,7 +140,6 @@ web server.
 %package devel
 Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP server
-Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pkgconfig
 Requires: %{name} = %{version}-%{release}
 # IUS-isms
@@ -165,7 +161,6 @@ to install this package.
 Group: Documentation
 Summary: Documentation for the Apache HTTP server
 Requires: %{name} = %{version}-%{release}
-Obsoletes: secureweb-manual, apache-manual
 BuildArch: noarch
 # IUS-isms
 Provides: %{real_name}-manual = %{version}-%{release}
@@ -215,7 +210,6 @@ BuildRequires: openssl-devel
 Requires(post): openssl >= 0.9.7f-4, /bin/cat, /bin/hostname
 Requires(pre): %{name}-filesystem
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-Obsoletes: stronghold-mod_ssl
 # IUS-isms
 Provides: mod_ssl = 1:%{version}-%{release}
 Provides: mod_ssl%{?_isa} = 1:%{version}-%{release}
@@ -380,7 +374,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap --disable-file-cache
+        --disable-imagemap --disable-file-cache \
         $*
 make %{?_smp_mflags}
 
