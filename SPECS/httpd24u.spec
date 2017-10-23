@@ -175,7 +175,7 @@ Conflicts: %{real_name}-manual < %{version}
 %description manual
 The %{name}-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs/2.2/.
+also be found at http://httpd.apache.org/docs/2.4/.
 
 
 %package filesystem
@@ -830,6 +830,7 @@ exit $rv
 %changelog
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
+- Correct link in -manual %%description
 
 * Wed Oct 04 2017 Ben Harper <ben.harper@rackspace.com> - 2.4.28-1.ius
 - Latest upstream
