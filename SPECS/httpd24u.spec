@@ -1,12 +1,7 @@
-%global real_name httpd
-%global ius_suffix 24u
 %global apr apr15u
 %global apu apu15u
-%global aprver 1
-%global apuver 1
-%global apr_config %{apr}-%{aprver}-config
-%global apu_config %{apu}-%{apuver}-config
-
+%global apr_config %{apr}-1-config
+%global apu_config %{apu}-1-config
 
 %define contentdir %{_datadir}/httpd
 %define docroot /var/www
@@ -39,19 +34,17 @@
 %{?filter_setup}
 
 Summary: Apache HTTP Server
-Name: %{real_name}%{ius_suffix}
+Name: httpd24u
 Version: 2.4.29
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
-Source3: httpd.sysconf
 Source4: httpd-ssl-pass-dialog
 Source5: httpd.tmpfiles
 Source6: httpd.service
 Source7: action-graceful.sh
 Source8: action-configtest.sh
-Source9: httpd.init
 Source10: httpd.conf
 Source11: 00-base.conf
 Source12: 00-mpm.conf
@@ -71,14 +64,17 @@ Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
-Source29: httpd.logrotate-legacy
 # Documentation
 Source30: README.confd
 Source31: README.confmod
 Source32: httpd.service.xml
 Source40: htcacheclean.service
 Source41: htcacheclean.sysconf
-Source42: htcacheclean.init
+# Compatibility
+Source50: httpd.sysconf
+Source51: httpd.init
+Source52: htcacheclean.init
+Source53: httpd.logrotate-legacy
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
@@ -99,7 +95,9 @@ Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
+
 # Bug fixes
+
 # Security fixes
 
 License: ASL 2.0
@@ -115,7 +113,6 @@ Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
 Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
 Requires: %{name}-tools = %{version}-%{release}
 Requires: %{name}-filesystem = %{version}-%{release}
-Requires: nghttp2 >= 1.5.0
 Requires(pre): %{name}-filesystem = %{version}-%{release}
 %if %{with systemd}
 Requires(preun): systemd-units
@@ -127,9 +124,9 @@ Requires(post): chkconfig
 %endif
 
 # IUS-isms
-Provides: %{real_name} = %{version}-%{release}
-Provides: %{real_name}%{?_isa} = %{version}-%{release}
-Conflicts: %{real_name} < %{version}
+Provides: httpd = %{version}-%{release}
+Provides: httpd%{?_isa} = %{version}-%{release}
+Conflicts: httpd < %{version}
 
 
 %description
@@ -139,53 +136,54 @@ web server.
 
 %package devel
 Group: Development/Libraries
-Summary: Development interfaces for the Apache HTTP server
+Summary: Development interfaces for the Apache HTTP Server
 Requires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pkgconfig
 Requires: %{name} = %{version}-%{release}
 # IUS-isms
-Provides: %{real_name}-devel = %{version}-%{release}
-Provides: %{real_name}-devel%{?_isa} = %{version}-%{release}
-Conflicts: %{real_name}-devel < %{version}
+Provides: httpd-devel = %{version}-%{release}
+Provides: httpd-devel%{?_isa} = %{version}-%{release}
+Conflicts: httpd-devel < %{version}
 
 %description devel
 The %{name}-devel package contains the APXS binary and other files
 that you need to build Dynamic Shared Objects (DSOs) for the
 Apache HTTP Server.
 
-If you are installing the Apache HTTP server and you want to be
+If you are installing the Apache HTTP Server and you want to be
 able to compile or develop additional modules for Apache, you need
 to install this package.
 
 
 %package manual
 Group: Documentation
-Summary: Documentation for the Apache HTTP server
+Summary: Documentation for the Apache HTTP Server
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
 # IUS-isms
-Provides: %{real_name}-manual = %{version}-%{release}
-Provides: %{real_name}-manual%{?_isa} = %{version}-%{release}
-Conflicts: %{real_name}-manual < %{version}
+Provides: httpd-manual = %{version}-%{release}
+Provides: httpd-manual%{?_isa} = %{version}-%{release}
+Conflicts: httpd-manual < %{version}
 
 %description manual
 The %{name}-manual package contains the complete manual and
-reference guide for the Apache HTTP server. The information can
-also be found at http://httpd.apache.org/docs/2.4/.
+reference guide for the Apache HTTP Server. The information can
+also be found at https://httpd.apache.org/docs/2.4/.
 
 
 %package filesystem
 Group: System Environment/Daemons
-Summary: The basic directory layout for the Apache HTTP server
+Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
+Requires(pre): /usr/sbin/groupadd
 # IUS-isms
-Provides: %{real_name}-filesystem = %{version}-%{release}
-Provides: %{real_name}-filesystem%{?_isa} = %{version}-%{release}
-Conflicts: %{real_name}-filesystem < %{version}
+Provides: httpd-filesystem = %{version}-%{release}
+Provides: httpd-filesystem%{?_isa} = %{version}-%{release}
+Conflicts: httpd-filesystem < %{version}
 
 %description filesystem
 The %{name}-filesystem package contains the basic directory layout
-for the Apache HTTP server including the correct permissions
+for the Apache HTTP Server including the correct permissions
 for the directories.
 
 
@@ -193,9 +191,9 @@ for the directories.
 Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
 # IUS-isms
-Provides: %{real_name}-tools = %{version}-%{release}
-Provides: %{real_name}-tools%{?_isa} = %{version}-%{release}
-Conflicts: %{real_name}-tools < %{version}
+Provides: httpd-tools = %{version}-%{release}
+Provides: httpd-tools%{?_isa} = %{version}-%{release}
+Conflicts: httpd-tools < %{version}
 
 %description tools
 The %{name}-tools package contains tools which can be used with
@@ -207,15 +205,15 @@ Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
 BuildRequires: openssl-devel
-Requires(post): openssl >= 0.9.7f-4, /bin/cat, /bin/hostname
+Requires(post): openssl, /bin/cat, /bin/hostname
 Requires(pre): %{name}-filesystem
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 # IUS-isms
 Provides: mod_ssl = 1:%{version}-%{release}
 Provides: mod_ssl%{?_isa} = 1:%{version}-%{release}
-Provides: mod%{ius_suffix}_ssl = 1:%{version}-%{release}
-Provides: mod%{ius_suffix}_ssl%{?_isa} = 1:%{version}-%{release}
-Obsoletes: mod%{ius_suffix}_ssl < 1:2.4.20-2.ius
+Provides: mod24u_ssl = 1:%{version}-%{release}
+Provides: mod24u_ssl%{?_isa} = 1:%{version}-%{release}
+Obsoletes: mod24u_ssl < 1:2.4.20-2.ius
 Conflicts: mod_ssl < 1:%{version}-%{release}
 
 %description mod_ssl
@@ -233,9 +231,9 @@ Epoch: 1
 # IUS-isms
 Provides: mod_proxy_html = 1:%{version}-%{release}
 Provides: mod_proxy_html%{?_isa} = 1:%{version}-%{release}
-Provides: mod%{ius_suffix}_proxy_html = 1:%{version}-%{release}
-Provides: mod%{ius_suffix}_proxy_html%{?_isa} = 1:%{version}-%{release}
-Obsoletes: mod%{ius_suffix}_proxy_html < 1:2.4.20-2.ius
+Provides: mod24u_proxy_html = 1:%{version}-%{release}
+Provides: mod24u_proxy_html%{?_isa} = 1:%{version}-%{release}
+Obsoletes: mod24u_proxy_html < 1:2.4.20-2.ius
 Conflicts: mod_proxy_html < 1:%{version}-%{release}
 
 %description mod_proxy_html
@@ -251,9 +249,9 @@ Requires: %{apr}-util-ldap >= 1.5.0
 # IUS-isms
 Provides: mod_ldap = %{version}-%{release}
 Provides: mod_ldap%{?_isa} = %{version}-%{release}
-Provides: mod%{ius_suffix}_ldap = %{version}-%{release}
-Provides: mod%{ius_suffix}_ldap%{?_isa} = %{version}-%{release}
-Obsoletes: mod%{ius_suffix}_ldap < 2.4.20-2.ius
+Provides: mod24u_ldap = %{version}-%{release}
+Provides: mod24u_ldap%{?_isa} = %{version}-%{release}
+Obsoletes: mod24u_ldap < 2.4.20-2.ius
 Conflicts: mod_ldap < %{version}
 
 %description mod_ldap
@@ -268,9 +266,9 @@ Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 # IUS-isms
 Provides: mod_session = %{version}-%{release}
 Provides: mod_session%{?_isa} = %{version}-%{release}
-Provides: mod%{ius_suffix}_session = %{version}-%{release}
-Provides: mod%{ius_suffix}_session%{?_isa} = %{version}-%{release}
-Obsoletes: mod%{ius_suffix}_session < 2.4.20-2.ius
+Provides: mod24u_session = %{version}-%{release}
+Provides: mod24u_session%{?_isa} = %{version}-%{release}
+Obsoletes: mod24u_session < 2.4.20-2.ius
 Conflicts: mod_session < %{version}
 
 %description mod_session
@@ -279,7 +277,7 @@ interface for storing and accessing per-user session data.
 
 
 %prep
-%setup -q -n %{real_name}-%{version}
+%setup -q -n httpd-%{version}
 %patch1 -p1 -b .apctl
 %patch2 -p1 -b .apxs
 %patch3 -p1 -b .deplibs
@@ -480,8 +478,8 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/httpd \
 
 # Make the MMN accessible to module packages
 echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
-mkdir -p $RPM_BUILD_ROOT/%{rpmmacrodir}
-cat > $RPM_BUILD_ROOT/%{rpmmacrodir}/macros.httpd <<EOF
+mkdir -p $RPM_BUILD_ROOT%{rpmmacrodir}
+cat > $RPM_BUILD_ROOT%{rpmmacrodir}/macros.httpd <<EOF
 %%_httpd_mmn %{mmnisa}
 %%_httpd_apxs %%{_bindir}/apxs
 %%_httpd_modconfdir %%{_sysconfdir}/httpd/conf.modules.d
@@ -542,11 +540,10 @@ done
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 %if %{with systemd}
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
-        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 %else
 install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate-legacy \
-        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 %endif
+        $RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # Install systemd service man pages
 install -m 644 -p httpd.service.8 httpd.socket.8 \
