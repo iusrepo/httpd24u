@@ -35,7 +35,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.29
+Version: 2.4.33
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -85,7 +85,7 @@ Patch8: httpd-2.4.3-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
-Patch23: httpd-2.4.4-export.patch
+Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
@@ -93,7 +93,6 @@ Patch27: httpd-2.4.2-icons.patch
 Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
-Patch31: httpd-2.4.18-sslmultiproxy.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 
 # Bug fixes
@@ -299,7 +298,6 @@ interface for storing and accessing per-user session data.
 %patch28 -p1 -b .r1332643+
 %{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
-%patch31 -p1 -b .sslmultiproxy
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 
 # Patch in the vendor string
@@ -819,6 +817,9 @@ exit $rv
 
 
 %changelog
+* Thu Mar 29 2018 Carl George <carl@george.computer> - 2.4.33-1.ius
+- Latest upstream
+
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
 - Correct link in -manual %%description
