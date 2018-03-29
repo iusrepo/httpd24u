@@ -8,16 +8,7 @@
 %define suexec_caller apache
 %define mmn 20120211
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
-
-%if 0%{?fedora}
-%define vstring %(source /etc/os-release; echo ${REDHAT_SUPPORT_PRODUCT})
-%else
-%if 0%{?centos}
-%define vstring CentOS
-%else
-%define vstring Red Hat
-%endif # centos
-%endif # fedora
+%define vstring IUS
 
 %if 0%{?rhel} >= 7
 %bcond_without systemd
@@ -819,6 +810,7 @@ exit $rv
 %changelog
 * Thu Mar 29 2018 Carl George <carl@george.computer> - 2.4.33-1.ius
 - Latest upstream
+- Set vstring to IUS
 
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
