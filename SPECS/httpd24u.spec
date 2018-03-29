@@ -71,7 +71,6 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch28: httpd-2.4.6-r1332643+.patch
 Patch29: httpd-2.4.27-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
@@ -276,7 +275,6 @@ interface for storing and accessing per-user session data.
 %patch25 -p1 -b .selinux
 %patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-%patch28 -p1 -b .r1332643+
 %{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
@@ -802,6 +800,7 @@ exit $rv
 - Latest upstream
 - Set vstring to IUS
 - Reduce suexec uidmin and gidmin to match RHEL
+- Drop NPN patch, no longer supported in major browsers
 
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
