@@ -76,6 +76,8 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 
 # Bug fixes
+# https://bugzilla.redhat.com/show_bug.cgi?id=1397243
+Patch58: httpd-2.4.33-r1738878.patch
 
 # Security fixes
 
@@ -283,6 +285,7 @@ interface for storing and accessing per-user session data.
 %{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
+%patch58 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -807,6 +810,7 @@ exit $rv
 - Reduce suexec uidmin and gidmin to match RHEL
 - Drop NPN patch, no longer supported in major browsers
 - Obsolete httpd24u-mod_proxy_uwsgi, merged upstream and is now part of this package
+- Add patch58 to set worker secret passed to tomcat in mod_proxy_ajp (Fedora)
 
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
