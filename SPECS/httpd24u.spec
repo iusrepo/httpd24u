@@ -102,6 +102,11 @@ Requires: initscripts >= 8.36
 Requires(post): chkconfig
 %endif
 
+# mod_proxy_uwsgi merged into httpd
+# https://github.com/unbit/uwsgi/issues/1636
+Provides: %{name}-mod_proxy_uwsgi = %{version}-%{release}
+Obsoletes: %{name}-mod_proxy_uwsgi < 2.0.16-2.ius
+
 # IUS-isms
 Provides: httpd = %{version}-%{release}
 Provides: httpd%{?_isa} = %{version}-%{release}
@@ -801,6 +806,7 @@ exit $rv
 - Set vstring to IUS
 - Reduce suexec uidmin and gidmin to match RHEL
 - Drop NPN patch, no longer supported in major browsers
+- Obsolete httpd24u-mod_proxy_uwsgi, merged upstream and is now part of this package
 
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
