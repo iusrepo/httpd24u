@@ -10,16 +10,6 @@
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring IUS
 
-%if 0%{?rhel} >= 7
-%bcond_without systemd
-%global suexec_uidmin 1000
-%global suexec_gidmin 1000
-%else
-%bcond_with systemd
-%global suexec_uidmin 500
-%global suexec_gidmin 100
-%endif
-
 # Drop automatic provides for module DSOs
 %{?filter_provides_in:%filter_provides_in %{_libdir}/httpd/modules/.*\.so$}
 %{?filter_setup}
@@ -350,7 +340,7 @@ export LYNX_PATH=/usr/bin/links
         --without-suexec-logfile \
         --with-suexec-syslog \
         --with-suexec-bin=%{_sbindir}/suexec \
-        --with-suexec-uidmin=%{suexec_uidmin} --with-suexec-gidmin=%{suexec_gidmin} \
+        --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -811,6 +801,7 @@ exit $rv
 * Thu Mar 29 2018 Carl George <carl@george.computer> - 2.4.33-1.ius
 - Latest upstream
 - Set vstring to IUS
+- Reduce suexec uidmin and gidmin to match RHEL
 
 * Mon Oct 23 2017 Carl George <carl@george.computer> - 2.4.29-1.ius
 - Latest upstream
