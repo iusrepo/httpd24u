@@ -10,6 +10,12 @@
 %define mmnisa %{mmn}%{__isa_name}%{__isa_bits}
 %define vstring IUS
 
+%if 0%{?rhel} >= 7
+%bcond_without systemd
+%else
+%bcond_with systemd
+%endif
+
 # Drop automatic provides for module DSOs
 %{?filter_provides_in:%filter_provides_in %{_libdir}/httpd/modules/.*\.so$}
 %{?filter_setup}
@@ -17,7 +23,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.33
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -804,6 +810,9 @@ exit $rv
 
 
 %changelog
+* Tue Apr 17 2018 Carl George <carl@george.computer> - 2.4.33-2.ius
+- Restore systemd conditional to ship correct files
+
 * Thu Mar 29 2018 Carl George <carl@george.computer> - 2.4.33-1.ius
 - Latest upstream
 - Set vstring to IUS
