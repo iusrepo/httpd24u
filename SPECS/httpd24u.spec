@@ -23,7 +23,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.33
-Release: 2.ius%{?dist}
+Release: 3.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -67,8 +67,7 @@ Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch7: httpd-2.4.3-layout.patch
-Patch8: httpd-2.4.3-layout-legacy.patch
+Patch8: httpd-2.4.33-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -275,9 +274,7 @@ interface for storing and accessing per-user session data.
 %patch3 -p1 -b .deplibs
 %{?with_systemd:%patch6 -p1 -b .apctlsystemd}
 
-%if 0%{?rhel} >= 7
-%patch7 -p1 -b .layout
-%else
+%if 0%{?rhel} && 0%{?rhel} < 7
 %patch8 -p1 -b .layout
 %endif
 
@@ -810,6 +807,9 @@ exit $rv
 
 
 %changelog
+* Wed Apr 18 2018 Carl George <carl@george.computer> - 2.4.33-3.ius
+- Fix pid file location on EL6
+
 * Tue Apr 17 2018 Carl George <carl@george.computer> - 2.4.33-2.ius
 - Restore systemd conditional to ship correct files
 

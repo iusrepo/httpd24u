@@ -1,0 +1,12 @@
+diff -Nurp httpd-2.4.33.orig/config.layout httpd-2.4.33/config.layout
+--- httpd-2.4.33.orig/config.layout	2018-02-09 04:30:35.000000000 -0600
++++ httpd-2.4.33/config.layout	2018-04-18 09:22:51.903851417 -0500
+@@ -149,7 +149,7 @@
+     cgidir:        /var/www/cgi-bin
+     includedir:    ${prefix}/include/httpd
+     localstatedir: /var
+-    runtimedir:    /run/httpd
++    runtimedir:    ${localstatedir}/run/httpd
+     logfiledir:    ${localstatedir}/log/httpd
+     proxycachedir: ${localstatedir}/cache/httpd/proxy
+ </Layout>     
