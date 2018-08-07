@@ -76,7 +76,7 @@ Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.27-systemd.patch
+Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 
@@ -809,6 +809,7 @@ exit $rv
 %changelog
 * Tue Aug 07 2018 Carl George <carl@george.computer> - 2.4.34-1.ius
 - Latest upstream
+- mod_systemd: show bound ports in status and log to journal at startup (Fedora)
 
 * Wed Apr 18 2018 Carl George <carl@george.computer> - 2.4.33-3.ius
 - Fix pid file location on EL6

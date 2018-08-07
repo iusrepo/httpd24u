@@ -1,9 +1,5 @@
-diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
-diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
-diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
-diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules/arch/unix/config5.m4
---- httpd-2.4.27/modules/arch/unix/config5.m4.systemd
-+++ httpd-2.4.27/modules/arch/unix/config5.m4
+--- httpd-2.4.33/modules/arch/unix/config5.m4.systemd
++++ httpd-2.4.33/modules/arch/unix/config5.m4
 @@ -18,6 +18,16 @@
    fi
  ])
@@ -21,10 +17,9 @@ diff -uap httpd-2.4.27/modules/arch/unix/config5.m4.systemd httpd-2.4.27/modules
  APR_ADDTO(INCLUDES, [-I\$(top_srcdir)/$modpath_current])
  
  APACHE_MODPATH_FINISH
-diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modules/arch/unix/mod_systemd.c
---- httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd
-+++ httpd-2.4.27/modules/arch/unix/mod_systemd.c
-@@ -0,0 +1,161 @@
+--- httpd-2.4.33/modules/arch/unix/mod_systemd.c.systemd
++++ httpd-2.4.33/modules/arch/unix/mod_systemd.c
+@@ -0,0 +1,223 @@
 +/* Licensed to the Apache Software Foundation (ASF) under one or more
 + * contributor license agreements.  See the NOTICE file distributed with
 + * this work for additional information regarding copyright ownership.
@@ -56,6 +51,7 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +#include "mpm_common.h"
 +
 +#include "systemd/sd-daemon.h"
++#include "systemd/sd-journal.h"
 +
 +#if APR_HAVE_UNISTD_H
 +#include <unistd.h>
@@ -65,6 +61,7 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +static int shutdown_counter = 0;
 +static unsigned long bytes_served;
 +static pid_t mainpid;
++static char describe_listeners[50];
 +
 +static int systemd_pre_config(apr_pool_t *pconf, apr_pool_t *plog,
 +                              apr_pool_t *ptemp)
@@ -76,6 +73,55 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +    return OK;
 +}
 +
++static char *dump_listener(ap_listen_rec *lr, apr_pool_t *p)
++{
++    apr_sockaddr_t *sa = lr->bind_addr;
++    char addr[128];
++
++    if (apr_sockaddr_is_wildcard(sa)) {
++        return apr_pstrcat(p, "port ", apr_itoa(p, sa->port), NULL);
++    }
++
++    apr_sockaddr_ip_getbuf(addr, sizeof addr, sa);
++
++    return apr_psprintf(p, "%s port %u", addr, sa->port);
++}
++
++static int systemd_post_config(apr_pool_t *pconf, apr_pool_t *plog,
++                               apr_pool_t *ptemp, server_rec *s)
++{
++    ap_listen_rec *lr;
++    apr_size_t plen = sizeof describe_listeners;
++    char *p = describe_listeners;
++
++    if (ap_state_query(AP_SQ_MAIN_STATE) == AP_SQ_MS_CREATE_PRE_CONFIG)
++        return OK;
++
++    for (lr = ap_listeners; lr; lr = lr->next) {
++        char *s = dump_listener(lr, ptemp);
++
++        if (strlen(s) + 3 < plen) {
++            char *newp = apr_cpystrn(p, s, plen);
++            if (lr->next)
++                newp = apr_cpystrn(newp, ", ", 3);
++            plen -= newp - p;
++            p = newp;
++        }
++        else {
++            if (plen < 4) {
++                p = describe_listeners + sizeof describe_listeners - 4;
++                plen = 4;
++            }
++            apr_cpystrn(p, "...", plen);
++            break;
++        }
++    }
++
++    sd_journal_print(LOG_INFO, "Server configured, listening on: %s", describe_listeners);
++
++    return OK;
++}
++
 +static int systemd_pre_mpm(apr_pool_t *p, ap_scoreboard_e sb_type)
 +{
 +    int rv;
@@ -83,8 +129,9 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +    mainpid = getpid();
 +
 +    rv = sd_notifyf(0, "READY=1\n"
-+                    "STATUS=Processing requests...\n"
-+                    "MAINPID=%" APR_PID_T_FMT, mainpid);
++                    "STATUS=Started, listening on: %s\n"
++                    "MAINPID=%" APR_PID_T_FMT,
++                    describe_listeners, mainpid);
 +    if (rv < 0) {
 +        ap_log_perror(APLOG_MARK, APLOG_ERR, 0, p, APLOGNO(02395)
 +                     "sd_notifyf returned an error %d", rv);
@@ -106,18 +153,26 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +    }
 +    
 +    ap_get_sload(&sload);
-+    /* up_time in seconds */
-+    up_time = (apr_uint32_t) apr_time_sec(apr_time_now() -
-+                               ap_scoreboard_image->global->restart_time);
 +
-+    apr_strfsize((unsigned long)((float) (sload.bytes_served)
-+                                 / (float) up_time), bps);
++    if (sload.access_count == 0) {
++        rv = sd_notifyf(0, "READY=1\n"
++                        "STATUS=Running, listening on: %s\n",
++                        describe_listeners);
++    }
++    else {
++        /* up_time in seconds */
++        up_time = (apr_uint32_t) apr_time_sec(apr_time_now() -
++                                              ap_scoreboard_image->global->restart_time);
 +
-+    rv = sd_notifyf(0, "READY=1\n"
-+                    "STATUS=Total requests: %lu; Idle/Busy workers %d/%d;"
-+                    "Requests/sec: %.3g; Bytes served/sec: %sB/sec\n",
-+                    sload.access_count, sload.idle, sload.busy,
-+                    ((float) sload.access_count) / (float) up_time, bps);
++        apr_strfsize((unsigned long)((float) (sload.bytes_served)
++                                     / (float) up_time), bps);
++
++        rv = sd_notifyf(0, "READY=1\n"
++                        "STATUS=Total requests: %lu; Idle/Busy workers %d/%d;"
++                        "Requests/sec: %.3g; Bytes served/sec: %sB/sec\n",
++                        sload.access_count, sload.idle, sload.busy,
++                        ((float) sload.access_count) / (float) up_time, bps);
++    }
 +
 +    if (rv < 0) {
 +        ap_log_error(APLOG_MARK, APLOG_ERR, 0, s, APLOGNO(02396)
@@ -152,6 +207,8 @@ diff -uap httpd-2.4.27/modules/arch/unix/mod_systemd.c.systemd httpd-2.4.27/modu
 +{
 +    /* Enable ap_extended_status. */
 +    ap_hook_pre_config(systemd_pre_config, NULL, NULL, APR_HOOK_LAST);
++    /* Grab the listener config. */
++    ap_hook_post_config(systemd_post_config, NULL, NULL, APR_HOOK_LAST);
 +    /* We know the PID in this hook ... */
 +    ap_hook_pre_mpm(systemd_pre_mpm, NULL, NULL, APR_HOOK_LAST);
 +    /* Used to update httpd's status line using sd_notifyf */
