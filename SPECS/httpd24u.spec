@@ -22,8 +22,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.33
-Release: 3.ius%{?dist}
+Version: 2.4.34
+Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -82,7 +82,7 @@ Patch34: httpd-2.4.17-socket-activation.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.33-r1738878.patch
+Patch58: httpd-2.4.34-r1738878.patch
 
 # Security fixes
 
@@ -283,7 +283,7 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .r1337344+
+#patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
@@ -807,6 +807,9 @@ exit $rv
 
 
 %changelog
+* Tue Aug 07 2018 Carl George <carl@george.computer> - 2.4.34-1.ius
+- Latest upstream
+
 * Wed Apr 18 2018 Carl George <carl@george.computer> - 2.4.33-3.ius
 - Fix pid file location on EL6
 
