@@ -23,7 +23,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.34
-Release: 1.ius%{?dist}
+Release: 2.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -51,6 +51,7 @@ Source25: 01-session.conf
 Source26: 10-listen443.conf
 Source27: httpd.socket
 Source28: 00-optional.conf
+Source29: 01-dbd.conf
 # Documentation
 Source30: README.confd
 Source31: README.confmod
@@ -250,6 +251,16 @@ The mod_ldap and mod_authnz_ldap modules add support for LDAP
 authentication to the Apache HTTP Server.
 
 
+%package mod_dbd
+Group: System Environment/Daemons
+Summary: SQL authentication modules for the Apache HTTP Server
+Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+
+%description mod_dbd
+The mod_dbd, mod_auth[nz]_dbd, and mod_session_dbd modules add support
+for SQL authentication and session storage to the Apache HTTP Server.
+
+
 %package mod_session
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
@@ -358,6 +369,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-cache \
         --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
+        --enable-dbd --enable-authn-dbd --enable-authz-dbd --enable-session-dbd \
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap --disable-file-cache \
@@ -392,7 +404,7 @@ install -m 644 $RPM_SOURCE_DIR/README.confd \
 install -m 644 $RPM_SOURCE_DIR/README.confmod \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/README
 for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
-         00-proxy.conf 00-ssl.conf 01-ldap.conf 00-proxyhtml.conf \
+         00-proxy.conf 00-ssl.conf 01-ldap.conf 01-dbd.conf 00-proxyhtml.conf \
          01-ldap.conf %{?with_systemd:00-systemd.conf} 01-session.conf 00-optional.conf; do
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
@@ -693,6 +705,7 @@ exit $rv
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-ssl.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/00-proxyhtml.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
+%exclude %{_sysconfdir}/httpd/conf.modules.d/01-dbd.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
 %config(noreplace) %{_sysconfdir}/sysconfig/ht*
@@ -718,6 +731,7 @@ exit $rv
 %exclude %{_libdir}/httpd/modules/mod_auth_form.so
 %exclude %{_libdir}/httpd/modules/mod_ssl.so
 %exclude %{_libdir}/httpd/modules/mod_*ldap.so
+%exclude %{_libdir}/httpd/modules/mod_*dbd.so
 %exclude %{_libdir}/httpd/modules/mod_proxy_html.so
 %exclude %{_libdir}/httpd/modules/mod_xml2enc.so
 %exclude %{_libdir}/httpd/modules/mod_session*.so
@@ -791,6 +805,10 @@ exit $rv
 %{_libdir}/httpd/modules/mod_*ldap.so
 %config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 
+%files mod_dbd
+%{_libdir}/httpd/modules/mod_*dbd.so
+%config(noreplace) %{_sysconfdir}/httpd/conf.modules.d/01-dbd.conf
+
 %files mod_session
 %{_libdir}/httpd/modules/mod_session*.so
 %{_libdir}/httpd/modules/mod_auth_form.so
@@ -807,6 +825,9 @@ exit $rv
 
 
 %changelog
+* Thu Aug 30 2018 Steve Mokris <smokris@softpixel.com> - 2.4.34-2.ius
+- Create a subpackage for mod_dbd, mod_authn_dbd, mod_authz_dbd, and mod_session_dbd
+
 * Tue Aug 07 2018 Carl George <carl@george.computer> - 2.4.34-1.ius
 - Latest upstream
 - mod_systemd: show bound ports in status and log to journal at startup (Fedora)
