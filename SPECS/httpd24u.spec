@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.34
+Version: 2.4.35
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -67,7 +67,7 @@ Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.9-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch8: httpd-2.4.33-layout-legacy.patch
+Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.25-detect-systemd.patch
 # Features/functional changes
@@ -807,6 +807,9 @@ exit $rv
 
 
 %changelog
+* Tue Oct 16 2018 Carl George <carl@george.computer> - 2.4.35-1.ius
+- Latest upstream
+
 * Tue Aug 07 2018 Carl George <carl@george.computer> - 2.4.34-1.ius
 - Latest upstream
 - mod_systemd: show bound ports in status and log to journal at startup (Fedora)
