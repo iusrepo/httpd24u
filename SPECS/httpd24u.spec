@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.35
+Version: 2.4.37
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -114,10 +114,10 @@ Requires(post): chkconfig
 Provides: %{name}-mod_proxy_uwsgi = %{version}-%{release}
 Obsoletes: %{name}-mod_proxy_uwsgi < 2.0.16-2.ius
 
-# IUS-isms
+# safe replacement
 Provides: httpd = %{version}-%{release}
 Provides: httpd%{?_isa} = %{version}-%{release}
-Conflicts: httpd < %{version}
+Conflicts: httpd < %{version}-%{release}
 
 
 %description
@@ -130,10 +130,10 @@ Group: Development/Libraries
 Summary: Development interfaces for the Apache HTTP Server
 Requires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pkgconfig
 Requires: %{name} = %{version}-%{release}
-# IUS-isms
+# safe replacement
 Provides: httpd-devel = %{version}-%{release}
 Provides: httpd-devel%{?_isa} = %{version}-%{release}
-Conflicts: httpd-devel < %{version}
+Conflicts: httpd-devel < %{version}-%{release}
 
 %description devel
 The %{name}-devel package contains the APXS binary and other files
@@ -150,10 +150,10 @@ Group: Documentation
 Summary: Documentation for the Apache HTTP Server
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
-# IUS-isms
+# safe replacement
 Provides: httpd-manual = %{version}-%{release}
 Provides: httpd-manual%{?_isa} = %{version}-%{release}
-Conflicts: httpd-manual < %{version}
+Conflicts: httpd-manual < %{version}-%{release}
 
 %description manual
 The %{name}-manual package contains the complete manual and
@@ -167,10 +167,10 @@ Summary: The basic directory layout for the Apache HTTP Server
 BuildArch: noarch
 Requires(pre): /usr/sbin/useradd
 Requires(pre): /usr/sbin/groupadd
-# IUS-isms
+# safe replacement
 Provides: httpd-filesystem = %{version}-%{release}
 Provides: httpd-filesystem%{?_isa} = %{version}-%{release}
-Conflicts: httpd-filesystem < %{version}
+Conflicts: httpd-filesystem < %{version}-%{release}
 
 %description filesystem
 The %{name}-filesystem package contains the basic directory layout
@@ -181,10 +181,10 @@ for the directories.
 %package tools
 Group: System Environment/Daemons
 Summary: Tools for use with the Apache HTTP Server
-# IUS-isms
+# safe replacement
 Provides: httpd-tools = %{version}-%{release}
 Provides: httpd-tools%{?_isa} = %{version}-%{release}
-Conflicts: httpd-tools < %{version}
+Conflicts: httpd-tools < %{version}-%{release}
 
 %description tools
 The %{name}-tools package contains tools which can be used with
@@ -199,12 +199,13 @@ BuildRequires: openssl-devel
 Requires(post): openssl, /bin/cat, /bin/hostname
 Requires(pre): %{name}-filesystem
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-# IUS-isms
-Provides: mod_ssl = 1:%{version}-%{release}
-Provides: mod_ssl%{?_isa} = 1:%{version}-%{release}
+# rename from mod24u_ssl
 Provides: mod24u_ssl = 1:%{version}-%{release}
 Provides: mod24u_ssl%{?_isa} = 1:%{version}-%{release}
 Obsoletes: mod24u_ssl < 1:2.4.20-2.ius
+# safe replacement
+Provides: mod_ssl = 1:%{version}-%{release}
+Provides: mod_ssl%{?_isa} = 1:%{version}-%{release}
 Conflicts: mod_ssl < 1:%{version}-%{release}
 
 %description mod_ssl
@@ -219,12 +220,13 @@ Summary: HTML and XML content filters for the Apache HTTP Server
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 BuildRequires: libxml2-devel
 Epoch: 1
-# IUS-isms
-Provides: mod_proxy_html = 1:%{version}-%{release}
-Provides: mod_proxy_html%{?_isa} = 1:%{version}-%{release}
+# rename from mod24u_proxy_html
 Provides: mod24u_proxy_html = 1:%{version}-%{release}
 Provides: mod24u_proxy_html%{?_isa} = 1:%{version}-%{release}
 Obsoletes: mod24u_proxy_html < 1:2.4.20-2.ius
+# safe replacement
+Provides: mod_proxy_html = 1:%{version}-%{release}
+Provides: mod_proxy_html%{?_isa} = 1:%{version}-%{release}
 Conflicts: mod_proxy_html < 1:%{version}-%{release}
 
 %description mod_proxy_html
@@ -237,13 +239,14 @@ Group: System Environment/Daemons
 Summary: LDAP authentication modules for the Apache HTTP Server
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
 Requires: %{apr}-util-ldap >= 1.5.0
-# IUS-isms
-Provides: mod_ldap = %{version}-%{release}
-Provides: mod_ldap%{?_isa} = %{version}-%{release}
+# rename from mod24u_ldap
 Provides: mod24u_ldap = %{version}-%{release}
 Provides: mod24u_ldap%{?_isa} = %{version}-%{release}
 Obsoletes: mod24u_ldap < 2.4.20-2.ius
-Conflicts: mod_ldap < %{version}
+# safe replacement
+Provides: mod_ldap = %{version}-%{release}
+Provides: mod_ldap%{?_isa} = %{version}-%{release}
+Conflicts: mod_ldap < %{version}-%{release}
 
 %description mod_ldap
 The mod_ldap and mod_authnz_ldap modules add support for LDAP
@@ -254,13 +257,14 @@ authentication to the Apache HTTP Server.
 Group: System Environment/Daemons
 Summary: Session interface for the Apache HTTP Server
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
-# IUS-isms
-Provides: mod_session = %{version}-%{release}
-Provides: mod_session%{?_isa} = %{version}-%{release}
+# rename from mod24u_session
 Provides: mod24u_session = %{version}-%{release}
 Provides: mod24u_session%{?_isa} = %{version}-%{release}
 Obsoletes: mod24u_session < 2.4.20-2.ius
-Conflicts: mod_session < %{version}
+# safe replacement
+Provides: mod_session = %{version}-%{release}
+Provides: mod_session%{?_isa} = %{version}-%{release}
+Conflicts: mod_session < %{version}-%{release}
 
 %description mod_session
 The mod_session module and associated backends provide an abstract
@@ -695,7 +699,8 @@ exit $rv
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-ldap.conf
 %exclude %{_sysconfdir}/httpd/conf.modules.d/01-session.conf
 
-%config(noreplace) %{_sysconfdir}/sysconfig/ht*
+%config(noreplace) %{_sysconfdir}/sysconfig/httpd
+%config(noreplace) %{_sysconfdir}/sysconfig/htcacheclean
 %if %{with systemd}
 %{_prefix}/lib/tmpfiles.d/httpd.conf
 %dir %{_libexecdir}/initscripts/legacy-actions/httpd
@@ -741,8 +746,9 @@ exit $rv
 %{_mandir}/man8/*
 
 %if %{with systemd}
-%{_unitdir}/*.service
-%{_unitdir}/*.socket
+%{_unitdir}/httpd.service
+%{_unitdir}/htcacheclean.service
+%{_unitdir}/httpd.socket
 %else
 # sysvinit
 %{_sysconfdir}/rc.d/init.d/httpd
@@ -807,6 +813,9 @@ exit $rv
 
 
 %changelog
+* Mon Jan 07 2019 Carl George <carl@george.computer> - 2.4.37-1.ius
+- Latest upstream
+
 * Tue Oct 16 2018 Carl George <carl@george.computer> - 2.4.35-1.ius
 - Latest upstream
 
