@@ -22,7 +22,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.38
+Version: 2.4.39
 Release: 1.ius%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -813,6 +813,9 @@ exit $rv
 
 
 %changelog
+* Tue Apr 02 2019 Carl George <carl@george.computer> - 2.4.39-1.ius
+- Latest upstream
+
 * Mon Mar 11 2019 Carl George <carl@george.computer> - 2.4.38-1.ius
 - Latest upstream
 
