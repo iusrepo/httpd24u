@@ -616,7 +616,7 @@ fi
 
 %if %{with systemd}
 %postun
-%systemd_postun
+%systemd_postun httpd.service htcacheclean.service httpd.socket
 %endif
 
 %posttrans
@@ -828,6 +828,7 @@ exit $rv
 %changelog
 * Thu Jun 13 2019 Carl George <carl@george.computer> - 2.4.39-2
 - Enable mod_brotli
+- Fix systemd_postun usage
 
 * Tue Apr 02 2019 Carl George <carl@george.computer> - 2.4.39-1.ius
 - Latest upstream
