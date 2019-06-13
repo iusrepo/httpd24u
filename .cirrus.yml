@@ -1,4 +1,5 @@
 task:
+  only_if: $CIRRUS_TAG == ''
   env:
     matrix:
       - RELEASEVER: 6
