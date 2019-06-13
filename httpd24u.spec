@@ -12,8 +12,10 @@
 
 %if 0%{?rhel} >= 7
 %bcond_without systemd
+%bcond_without brotli
 %else
 %bcond_with systemd
+%bcond_with brotli
 %endif
 
 # Drop automatic provides for module DSOs
@@ -23,7 +25,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.39
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -90,6 +92,9 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
+%if %{with brotli}
+BuildRequires: brotli-devel
+%endif
 BuildRequires: %{apr}-devel >= 1.5.0, %{apr}-util-devel >= 1.5.0, pcre-devel >= 5.0
 BuildRequires: libnghttp2-devel
 %{?with_systemd:BuildRequires: systemd-devel}
@@ -354,6 +359,9 @@ export LYNX_PATH=/usr/bin/links
         --with-suexec-syslog \
         --with-suexec-bin=%{_sbindir}/suexec \
         --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+        %if %{with brotli}
+        --with-brotli \
+        %endif
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
@@ -401,6 +409,11 @@ for f in 00-base.conf 00-mpm.conf 00-lua.conf 01-cgi.conf 00-dav.conf \
   install -m 644 -p $RPM_SOURCE_DIR/$f \
         $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/$f
 done
+
+# remove brotli module config if disabled
+%if %{without brotli}
+sed -e '/brotli_module/d' -i $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.modules.d/00-base.conf
+%endif
 
 %if %{with systemd}
 # install systemd override drop directory
@@ -813,6 +826,9 @@ exit $rv
 
 
 %changelog
+* Thu Jun 13 2019 Carl George <carl@george.computer> - 2.4.39-2
+- Enable mod_brotli
+
 * Tue Apr 02 2019 Carl George <carl@george.computer> - 2.4.39-1.ius
 - Latest upstream
 
