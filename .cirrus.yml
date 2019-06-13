@@ -1,0 +1,19 @@
+task:
+  env:
+    matrix:
+      - RELEASEVER: 6
+      - RELEASEVER: 7
+  name: el$RELEASEVER
+  container:
+    image: centos:$RELEASEVER
+  epel_script:      yum --assumeyes install https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm
+  toolchain_script: yum --assumeyes install yum-utils rpmdevtools @buildsys-build
+  sources_script:   spectool --get-files $CIRRUS_REPO_NAME.spec
+  srpm_script:      rpmbuild -bs --define "_sourcedir $PWD" --define "_specdir $PWD" --define "dist .el$RELEASEVER.ius" --define "vendor IUS" $CIRRUS_REPO_NAME.spec
+  builddep_script:  yum-builddep --assumeyes $HOME/rpmbuild/SRPMS/$CIRRUS_REPO_NAME-*.src.rpm
+  rpm_script:       rpmbuild -bb --define "_sourcedir $PWD" --define "_specdir $PWD" --define "dist .el$RELEASEVER.ius" --define "vendor IUS" $CIRRUS_REPO_NAME.spec
+  gather_script:
+    - mv --verbose $HOME/rpmbuild/SRPMS/*.src.rpm .
+    - mv --verbose $HOME/rpmbuild/RPMS/*/*.rpm .
+  results_artifacts:
+    path: '*.rpm'

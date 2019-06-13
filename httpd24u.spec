@@ -23,7 +23,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.39
-Release: 1.ius%{?dist}
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
