@@ -24,8 +24,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.39
-Release: 2%{?dist}
+Version: 2.4.41
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -826,6 +826,9 @@ exit $rv
 
 
 %changelog
+* Tue Aug 20 2019 Andreas Schnederle-Wagner <schnederle@futureweb.at> - 2.4.41-1
+- Latest upstream
+
 * Thu Jun 13 2019 Carl George <carl@george.computer> - 2.4.39-2
 - Enable mod_brotli
 - Fix systemd_postun usage
