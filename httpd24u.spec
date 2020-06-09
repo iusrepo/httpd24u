@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.41
+Version: 2.4.43
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -66,25 +66,25 @@ Source52: htcacheclean.init
 Source53: httpd.logrotate-legacy
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
-Patch2: httpd-2.4.9-apxs.patch
+Patch2: httpd-2.4.43-apxs.patch
 Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.25-detect-systemd.patch
+# Patch19: httpd-2.4.25-detect-systemd.patch - now in upstream
 # Features/functional changes
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.25-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.33-systemd.patch
+# Patch29: httpd-2.4.33-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 
 # Bug fixes
 # https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-Patch58: httpd-2.4.34-r1738878.patch
+# Patch58: httpd-2.4.34-r1738878.patch - now in upstream
 
 # Security fixes
 
@@ -92,6 +92,7 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
+BuildRequires: epel-rpm-macros
 %if %{with brotli}
 BuildRequires: brotli-devel
 %endif
@@ -287,17 +288,15 @@ interface for storing and accessing per-user session data.
 %patch8 -p1 -b .layout
 %endif
 
-%{?with_systemd:%patch19 -p1 -b .detectsystemd}
-
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 #patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-%{?with_systemd:%patch29 -p1 -b .systemd}
+# %{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
-%patch58 -p1 -b .r1738878
+# %patch58 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -373,6 +372,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap --disable-file-cache \
+        --enable-systemd \
         $*
 make %{?_smp_mflags}
 
