@@ -372,7 +372,9 @@ export LYNX_PATH=/usr/bin/links
         --enable-cgid --enable-cgi \
         --enable-authn-anon --enable-authn-alias \
         --disable-imagemap --disable-file-cache \
+        %if %{with systemd}
         --enable-systemd \
+        %endif
         $*
 make %{?_smp_mflags}
 
@@ -826,6 +828,9 @@ exit $rv
 
 
 %changelog
+* Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.41-3
+- Latest upstream
+
 * Tue Aug 20 2019 Andreas Schnederle-Wagner <schnederle@futureweb.at> - 2.4.41-1
 - Latest upstream
 
