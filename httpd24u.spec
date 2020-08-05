@@ -823,7 +823,7 @@ exit $rv
 
 
 %changelog
-* Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.41-3
+* Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.43-1
 - Latest upstream
 - Updated Patch2: httpd-2.4.43-apxs.patch
 - Updated Patch19: httpd-2.4.43-detect-systemd.patch
