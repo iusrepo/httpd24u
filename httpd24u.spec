@@ -71,20 +71,16 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-# Patch19: httpd-2.4.25-detect-systemd.patch - now in upstream
+Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
-Patch25: httpd-2.4.25-selinux.patch
+Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
-# Patch29: httpd-2.4.33-systemd.patch
+Patch29: httpd-2.4.43-detect-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
-
-# Bug fixes
-# https://bugzilla.redhat.com/show_bug.cgi?id=1397243
-# Patch58: httpd-2.4.34-r1738878.patch - now in upstream
 
 # Security fixes
 
@@ -293,10 +289,9 @@ interface for storing and accessing per-user session data.
 %patch25 -p1 -b .selinux
 #patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-# %{?with_systemd:%patch29 -p1 -b .systemd}
+%{?with_systemd:%patch29 -p1 -b .systemd}
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
-# %patch58 -p1 -b .r1738878
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -830,6 +825,9 @@ exit $rv
 %changelog
 * Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.41-3
 - Latest upstream
+- Updated Patch2: httpd-2.4.43-apxs.patch
+- Updated Patch19: httpd-2.4.43-detect-systemd.patch
+- Updated Patch25: 
 
 * Tue Aug 20 2019 Andreas Schnederle-Wagner <schnederle@futureweb.at> - 2.4.41-1
 - Latest upstream
