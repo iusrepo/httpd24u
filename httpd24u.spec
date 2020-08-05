@@ -76,7 +76,6 @@ Patch19: httpd-2.4.43-detect-systemd.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
-Patch26: httpd-2.4.4-r1337344+.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch29: httpd-2.4.43-detect-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
@@ -286,7 +285,6 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-#patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
 %patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
