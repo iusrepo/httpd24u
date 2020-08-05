@@ -289,7 +289,8 @@ interface for storing and accessing per-user session data.
 %patch25 -p1 -b .selinux
 #patch26 -p1 -b .r1337344+
 %patch27 -p1 -b .icons
-%{?with_systemd:%patch29 -p1 -b .systemd}
+# %{?with_systemd:%patch29 -p1 -b .systemd}
+%patch29 -p1 -b .systemd
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 
