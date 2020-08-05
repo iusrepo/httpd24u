@@ -827,7 +827,7 @@ exit $rv
 - Latest upstream
 - Updated Patch2: httpd-2.4.43-apxs.patch
 - Updated Patch19: httpd-2.4.43-detect-systemd.patch
-- Updated Patch25: 
+- Updated Patch25: httpd-2.4.43-selinux.patch
 
 * Tue Aug 20 2019 Andreas Schnederle-Wagner <schnederle@futureweb.at> - 2.4.41-1
 - Latest upstream
