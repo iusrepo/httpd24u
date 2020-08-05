@@ -88,7 +88,6 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: epel-rpm-macros
 %if %{with brotli}
 BuildRequires: brotli-devel
 %endif
