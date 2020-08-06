@@ -1,7 +1,6 @@
-diff -Naurp a/support/apxs.in b/support/apxs.in
---- a/support/apxs.in	2013-12-26 12:01:53.000000000 -0600
-+++ b/support/apxs.in	2015-07-27 13:57:32.581334998 -0500
-@@ -25,7 +25,18 @@ package apxs;
+--- a/support/apxs.in	2020-03-20 09:00:44.000000000 -0400
++++ b/support/apxs.in	2020-06-05 11:09:15.000000000 -0400
+@@ -35,7 +35,18 @@ if ($ddi >= 0) {
  
  my %config_vars = ();
  
@@ -18,10 +17,10 @@ diff -Naurp a/support/apxs.in b/support/apxs.in
 +
 +my $installbuilddir = $libdir . "/httpd/build";
 +
- get_config_vars("$installbuilddir/config_vars.mk",\%config_vars);
+ get_config_vars($destdir . "$installbuilddir/config_vars.mk",\%config_vars);
  
  # read the configuration variables once
-@@ -275,7 +286,7 @@ if ($opt_g) {
+@@ -285,7 +296,7 @@ if ($opt_g) {
      $data =~ s|%NAME%|$name|sg;
      $data =~ s|%TARGET%|$CFG_TARGET|sg;
      $data =~ s|%PREFIX%|$prefix|sg;
@@ -30,7 +29,7 @@ diff -Naurp a/support/apxs.in b/support/apxs.in
  
      my ($mkf, $mods, $src) = ($data =~ m|^(.+)-=#=-\n(.+)-=#=-\n(.+)|s);
  
-@@ -453,11 +464,11 @@ if ($opt_c) {
+@@ -463,11 +474,11 @@ if ($opt_c) {
      my $ldflags = "$CFG_LDFLAGS";
      if ($opt_p == 1) {
          
@@ -44,7 +43,7 @@ diff -Naurp a/support/apxs.in b/support/apxs.in
              chomp($apu_libs);
          }
          
-@@ -672,8 +683,8 @@ __DATA__
+@@ -682,8 +693,8 @@ __DATA__
  
  builddir=.
  top_srcdir=%PREFIX%
