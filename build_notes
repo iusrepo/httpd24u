@@ -1,0 +1,106 @@
+# This document is for Reference only and should not be considered authoritative. 
+# It is just to document some notes and to track changes in FC Project.
+
+TODO:
+- #%patch26 -p1 -b .gettid
+- #%patch41 -p1 -b .r1861793+
+- #%patch44 -p1 -b .luaresume
+
+
+IUS 2.4.46-1
+ The following patches are not part of IUS, but are in FC (I don't see that they were added
+ recently):	
+	Patch21: httpd-2.4.43-r1842929+.patch - Compute the name of a persistent state file (e.g. a database or long-lived cache) relative to the appropriate state directory.
+	Commented out Patch31: httpd-2.4.43-sslmultiproxy.patch - For an SSL_* variable, if mod_ssl is not enabled for this connection and another SSL module is present, pass through to that module.
+	Patch38: httpd-2.4.43-sslciphdefault.patch - Disable null and export ciphers by default, except for PROFILE= configs where the parser doesn't cope. 
+	Patch39: httpd-2.4.43-sslprotdefault.patch - Using OpenSSL/system default SSL/TLS protocols
+	Patch40: httpd-2.4.43-r1861269.patch - If only dumping the config, don't verify the paths
+	Patch42: httpd-2.4.43-r1828172+.patch - mod_cgi
+	Patch60: httpd-2.4.43-enable-sslv3.patch - Allowing SSLProtocol %s even though it is disabled by OpenSSL by default on this system 
+	Patch62: httpd-2.4.43-r1870095+.patch - TLS 1.3
+
+FC History - https://src.fedoraproject.org/rpms/httpd
+=====================================================
+845520 2.4.46-1
+new version 2.4.46
+edit 19: httpd-2.4.43-detect-systemd.patch (should be httpd-2.4.46-detect-systemd.patch)
+done - remove httpd-2.4.43-r1876548.patch
+add: 44. httpd-2.4.46-lua-resume.patch remove: httpd-2.4.43-lua-resume.patch
+
+426fad
+fix macro in mod_lua for lua 4.5
+Add Patch44: httpd-2.4.43-lua-resume.patch
+
+c592b0 2.4.43-5
+Remove %ghosted /etc/sysconfig/httpd file (#1850082)  -- line 650
+
+c8206d 2.4.43-4 use gettid() directly and use it for built-in ErrorLogFormat
+Add Patch26: httpd-2.4.43-gettid.patch
+
+5a137a -- no release
+Add 41: httpd-2.4.43-r1861793+ - patch from upstream.
+
+492862 2.4.43-3
+Add 43: httpd-2.4.43-sslcoalesce.patch
+
+356046 2.4.43-2
+done - add 22 httpd-2.4.43-mod_systemd.patch
+ - mod_systemd: restore descriptive startup logging
+not - add 63 httpd-2.4.43-r1876548.patch
+ - mod_ssl: fix leak in OCSP stapling code (PR 63687, r1876548)  
+ - as of 2.4.46-1 this was removed
+
+
+Console Configure Command
+=========================
+%global apr apr15u
+%global apu apu15u
+%global apr_config %{apr}-1-config
+%global apu_config %{apu}-1-config
+%define suexec_caller apache
+
+./configure \
+        --enable-mpms-shared=all \
+        --with-apr=/usr/bin/apr15u-1-config \
+        --with-apr-util=/usr/bin/apu15u-1-config \
+        --enable-suexec --with-suexec \
+        --enable-suexec-capabilities \
+        --with-suexec-caller=apache \
+        --with-suexec-docroot=%{docroot} \
+        --without-suexec-logfile \
+        --with-suexec-syslog \
+        --with-suexec-uidmin=500 --with-suexec-gidmin=100 \
+        --with-brotli \
+        --enable-pie \
+        --with-pcre \
+        --enable-mods-shared=all \
+        --enable-ssl --with-ssl --disable-distcache \
+        --enable-proxy --enable-proxy-fdpass \
+        --enable-cache \
+        --enable-disk-cache \
+        --enable-ldap --enable-authnz-ldap \
+        --enable-cgid --enable-cgi \
+        --enable-authn-anon --enable-authn-alias \
+        --disable-imagemap --disable-file-cache \
+        --enable-systemd \
+        $*
+        
+        
+# Skipping for now
+        --prefix=%{_sysconfdir}/httpd \
+        --exec-prefix=%{_prefix} \
+        --bindir=%{_bindir} \
+        --sbindir=%{_sbindir} \
+        --mandir=%{_mandir} \
+        --libdir=%{_libdir} \
+        --sysconfdir=%{_sysconfdir}/httpd/conf \
+        --includedir=%{_includedir}/httpd \
+        --libexecdir=%{_libdir}/httpd/modules \
+        --datadir=%{contentdir} \
+        --enable-layout=Fedora \
+        --with-installbuilddir=%{_libdir}/httpd/build \
+        --with-suexec-bin=%{_sbindir}/suexec \
+        %if %{with brotli}
+        %endif
+        %if %{with systemd}
+        %endif
