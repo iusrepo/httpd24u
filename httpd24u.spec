@@ -289,14 +289,12 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-# %patch26 -p1 -b .gettid
+%patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 %patch41 -p1 -b .r1861793+
 %patch43 -p1 -b .sslcoalesce
-#%patch44 -p1 -b .luaresume
-
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -828,6 +826,10 @@ exit $rv
 
 
 %changelog
+* Tue Sep 01 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.46-1
+- Latest upstream
+- Synced with Fedora patches
+
 * Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.43-1
 - Latest upstream
 

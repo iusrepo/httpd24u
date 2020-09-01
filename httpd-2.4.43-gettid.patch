@@ -16,7 +16,7 @@ diff --git a/configure.in b/configure.in
 index 423d58d4b9a..60cbf7b7f81 100644
 --- httpd-2.4.43/configure.in.gettid
 +++ httpd-2.4.43/configure.in
-@@ -500,7 +500,8 @@
+@@ -478,7 +500,8 @@
  timegm \
  getpgid \
  fopen64 \
@@ -26,7 +26,7 @@ index 423d58d4b9a..60cbf7b7f81 100644
  )
  
  dnl confirm that a void pointer is large enough to store a long integer
-@@ -511,16 +512,19 @@
+@@ -489,16 +512,19 @@
     APR_ADDTO(HTTPD_LIBS, [-lselinux])
  ])
  
@@ -52,6 +52,15 @@ index 423d58d4b9a..60cbf7b7f81 100644
  dnl ## Check for the tm_gmtoff field in struct tm to get the timezone diffs
 --- httpd-2.4.43/server/log.c.gettid
 +++ httpd-2.4.43/server/log.c
+@@ -55,7 +55,7 @@
+ #include "ap_mpm.h"
+ #include "ap_listen.h"
+ 
+-#if HAVE_GETTID
++#if HAVE_SYS_GETTID
+ #include <sys/syscall.h>
+ #include <sys/types.h>
+ #endif
 @@ -625,14 +625,18 @@
  #if APR_HAS_THREADS
      int result;
