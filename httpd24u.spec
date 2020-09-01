@@ -71,7 +71,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.43-detect-systemd.patch
+Patch19: httpd-2.4.46-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
@@ -79,7 +79,7 @@ Patch25: httpd-2.4.43-selinux.patch
 # Patch26: httpd-2.4.4-r1337344+.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.2-icons.patch
-Patch29: httpd-2.4.43-detect-systemd.patch
+# Patch29: httpd-2.4.43-detect-systemd.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
@@ -287,17 +287,17 @@ interface for storing and accessing per-user session data.
 %if 0%{?rhel} && 0%{?rhel} < 7
 %patch8 -p1 -b .layout
 %endif
-#%patch19 -p1 -b .detectsystemd -- moved to 19
+%patch19 -p1 -b .detectsystemd 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
 # %patch26 -p1 -b .r1337344+
-%patch26 -p1 -b .gettid
+# %patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
-%patch29 -p1 -b .systemd 
+#%patch29 -p1 -b .systemd -- moved to 19
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
-#%patch41 -p1 -b .r1861793+
+%patch41 -p1 -b .r1861793+
 %patch43 -p1 -b .sslcoalesce
 #%patch44 -p1 -b .luaresume
 

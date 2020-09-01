@@ -2,9 +2,9 @@
 # It is just to document some notes and to track changes in FC Project.
 
 TODO:
-- #%patch26 -p1 -b .gettid
-- #%patch41 -p1 -b .r1861793+
-- #%patch44 -p1 -b .luaresume
+- server/listen.c undefined reference to `sd_listen_fds'
+- #%patch26 -p1 -b .gettid    - patch works, build breaks
+- #%patch44 -p1 -b .luaresume - patch works, build breaks
 
 
 IUS 2.4.46-1
