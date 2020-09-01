@@ -76,10 +76,14 @@ Patch19: httpd-2.4.46-detect-systemd.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
+<<<<<<< HEAD
 # Patch26: httpd-2.4.4-r1337344+.patch
 Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.2-icons.patch
 # Patch29: httpd-2.4.43-detect-systemd.patch
+=======
+Patch27: httpd-2.4.2-icons.patch
+>>>>>>> 01da19ea40c5a896ebb43c60229c03a7687b8503
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
@@ -92,7 +96,6 @@ License: ASL 2.0
 Group: System Environment/Daemons
 BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
 BuildRequires: zlib-devel, libselinux-devel, lua-devel
-BuildRequires: epel-rpm-macros
 %if %{with brotli}
 BuildRequires: brotli-devel
 %endif
@@ -287,6 +290,7 @@ interface for storing and accessing per-user session data.
 %if 0%{?rhel} && 0%{?rhel} < 7
 %patch8 -p1 -b .layout
 %endif
+<<<<<<< HEAD
 %patch19 -p1 -b .detectsystemd 
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
@@ -295,6 +299,15 @@ interface for storing and accessing per-user session data.
 # %patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 #%patch29 -p1 -b .systemd -- moved to 19
+=======
+
+%patch19 -p1 -b .detectsystemd
+
+%patch23 -p1 -b .export
+%patch24 -p1 -b .corelimit
+%patch25 -p1 -b .selinux
+%patch27 -p1 -b .icons
+>>>>>>> 01da19ea40c5a896ebb43c60229c03a7687b8503
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 %patch41 -p1 -b .r1861793+
@@ -834,9 +847,6 @@ exit $rv
 %changelog
 * Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.43-1
 - Latest upstream
-- Updated Patch2: httpd-2.4.43-apxs.patch
-- Updated Patch19: httpd-2.4.43-detect-systemd.patch
-- Updated Patch25: httpd-2.4.43-selinux.patch
 
 * Tue Aug 20 2019 Andreas Schnederle-Wagner <schnederle@futureweb.at> - 2.4.41-1
 - Latest upstream
