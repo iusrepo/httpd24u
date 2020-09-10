@@ -25,7 +25,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.46
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -198,10 +198,11 @@ the Apache HTTP Server.
 Group: System Environment/Daemons
 Summary: SSL/TLS module for the Apache HTTP Server
 Epoch: 1
-BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat, /bin/hostname
+BuildRequires: openssl11-devel
+Requires(post): /bin/cat, /bin/hostname
 Requires(pre): %{name}-filesystem
 Requires: %{name} = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+Requires: openssl11-libs
 # rename from mod24u_ssl
 Provides: mod24u_ssl = 1:%{version}-%{release}
 Provides: mod24u_ssl%{?_isa} = 1:%{version}-%{release}
@@ -326,10 +327,27 @@ rm -rf srclib/{apr,apr-util,pcre}
 autoheader && autoconf || exit 1
 
 export CFLAGS=$RPM_OPT_FLAGS
-export LDFLAGS="-Wl,-z,relro,-z,now"
+export LDFLAGS=-Wl,-z,relro,-z,now
 
 # Hard-code path to links to avoid unnecessary builddep
 export LYNX_PATH=/usr/bin/links
+
+# Create OpenSSL 1.1 Directory Structure
+# EPEL puts the header files under /usr/include/openssl11/openssl
+# The configure script is looking for "${OPENSSLDIR}/include/openssl", 
+# EPEL puts the lib files under /usr/lib64/openssl11, configure wants "${OPENSSLDIR}/lib", 
+# so make a temp structure that configure can use.
+mkdir -p openssl11/include openssl11/lib
+pushd openssl11
+pushd include
+ln -s %{_includedir}/openssl11/openssl .
+popd
+pushd lib
+ln -s %{_libdir}/libcrypto.so.1.1 libcrypto.so
+ln -s %{_libdir}/libssl.so.1.1    libssl.so
+popd
+OPENSSLDIR=`pwd`
+popd
 
 # Build the daemon
 ./configure \
@@ -362,7 +380,7 @@ export LYNX_PATH=/usr/bin/links
         --enable-pie \
         --with-pcre \
         --enable-mods-shared=all \
-        --enable-ssl --with-ssl --disable-distcache \
+        --enable-ssl --with-ssl=${OPENSSLDIR} --disable-distcache \
         --enable-proxy --enable-proxy-fdpass \
         --enable-cache \
         --enable-disk-cache \

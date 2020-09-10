@@ -104,3 +104,10 @@ Console Configure Command
         %endif
         %if %{with systemd}
         %endif
+
+
+simple:
+./configure \
+        --with-apr=/usr/bin/apr15u-1-config \
+        --with-apr-util=/usr/bin/apu15u-1-config \
+        --enable-ssl --with-ssl
