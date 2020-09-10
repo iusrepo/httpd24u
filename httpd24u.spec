@@ -84,6 +84,10 @@ Patch41: httpd-2.4.43-r1861793+.patch
 Patch43: httpd-2.4.43-sslcoalesce.patch
 Patch44: httpd-2.4.46-lua-resume.patch
 
+	
+# Bug fixes
+Patch62: httpd-2.4.43-r1870095+.patch
+
 # Security fixes
 
 License: ASL 2.0
@@ -296,6 +300,8 @@ interface for storing and accessing per-user session data.
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 %patch41 -p1 -b .r1861793+
 %patch43 -p1 -b .sslcoalesce
+
+%patch62 -p1 -b .r1870095
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -844,6 +850,10 @@ exit $rv
 
 
 %changelog
+* Thu Sep 10 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.46-2
+- Built against OpenSSL 1.1 from EPEL
+- Added Upstream TLS 1.3 Patch r1870095+
+
 * Tue Sep 01 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.46-1
 - Latest upstream
 - Synced with Fedora patches
