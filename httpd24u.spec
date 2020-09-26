@@ -82,7 +82,6 @@ Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 Patch43: httpd-2.4.43-sslcoalesce.patch
-Patch44: httpd-2.4.46-lua-resume.patch
 
 # Security fixes
 
