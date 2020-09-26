@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.43
+Version: 2.4.46
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -76,9 +76,12 @@ Patch19: httpd-2.4.43-detect-systemd.patch
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
+Patch26: httpd-2.4.43-gettid.patch
 Patch27: httpd-2.4.2-icons.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
+Patch41: httpd-2.4.43-r1861793+.patch
+Patch43: httpd-2.4.43-sslcoalesce.patch
 
 # Security fixes
 
@@ -286,9 +289,12 @@ interface for storing and accessing per-user session data.
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
+%patch26 -p1 -b .gettid
 %patch27 -p1 -b .icons
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
+%patch41 -p1 -b .r1861793+
+%patch43 -p1 -b .sslcoalesce
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -820,6 +826,10 @@ exit $rv
 
 
 %changelog
+* Tue Sep 01 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.46-1
+- Latest upstream
+- Synced with Fedora patches
+
 * Tue Jun 09 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.43-1
 - Latest upstream
 
