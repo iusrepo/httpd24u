@@ -117,4 +117,3 @@ index 0e49cdc..72b4de7 100644
  #define luaL_setfuncs_compat(a,b) luaL_setfuncs(a,b,0)
  #else
  #define lua_rawlen(L,i)    lua_objlen(L, (i))
- 

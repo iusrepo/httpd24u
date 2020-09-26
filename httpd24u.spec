@@ -71,7 +71,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.46-detect-systemd.patch
+Patch19: httpd-2.4.43-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
@@ -285,7 +285,8 @@ interface for storing and accessing per-user session data.
 %patch8 -p1 -b .layout
 %endif
 
-%patch19 -p1 -b .detectsystemd 
+%patch19 -p1 -b .detectsystemd
+
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
