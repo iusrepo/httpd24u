@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.46
+Version: 2.4.48
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -81,7 +81,6 @@ Patch27: httpd-2.4.2-icons.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
-Patch43: httpd-2.4.43-sslcoalesce.patch
 
 # Security fixes
 
@@ -294,7 +293,6 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 %patch41 -p1 -b .r1861793+
-%patch43 -p1 -b .sslcoalesce
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -373,6 +371,7 @@ export LYNX_PATH=/usr/bin/links
         %if %{with systemd}
         --enable-systemd \
         %endif
+        --disable-http2 \
         $*
 make %{?_smp_mflags}
 
@@ -826,6 +825,9 @@ exit $rv
 
 
 %changelog
+* Fri Jun 04 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.48-1
+- Latest upstream
+
 * Tue Sep 01 2020 Steve Simpson <steven.simpson@parsons.com> - 2.4.46-1
 - Latest upstream
 - Synced with Fedora patches
