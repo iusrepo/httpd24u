@@ -371,7 +371,6 @@ export LYNX_PATH=/usr/bin/links
         %if %{with systemd}
         --enable-systemd \
         %endif
-        --disable-http2 \
         $*
 make %{?_smp_mflags}
 
