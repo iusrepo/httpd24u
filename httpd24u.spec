@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.49
+Version: 2.4.50
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
