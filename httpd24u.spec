@@ -824,6 +824,9 @@ exit $rv
 
 
 %changelog
+* Fri Oct 05 2021 Reporter4u <reporter4u@gnail.com> - 2.4.50-1
+- Latest upstream
+
 * Fri Oct 05 2021 Reporter4u <reporter4u@gnail.com> - 2.4.49-1
 - Latest upstream
 
