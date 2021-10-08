@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.48
+Version: 2.4.51
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -824,6 +824,9 @@ exit $rv
 
 
 %changelog
+* Fri Oct 28 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.51-1
+- Latest upstream
+
 * Fri Jun 04 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.48-1
 - Latest upstream
 
