@@ -827,7 +827,7 @@ exit $rv
 * Fri Oct 28 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.51-1
 - Latest upstream
 
-* Fri Oct 05 2021 Reporter4u <reporter4u@gmail.com> - 2.4.50-1
+* Tue Oct 05 2021 Reporter4u <reporter4u@gmail.com> - 2.4.50-1
 - Latest upstream
 
 * Fri Jun 04 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.48-1
