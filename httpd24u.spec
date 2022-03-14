@@ -81,6 +81,8 @@ Patch27: httpd-2.4.2-icons.patch
 Patch30: httpd-2.4.4-cachehardmax.patch
 Patch34: httpd-2.4.17-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
+	
+Patch65: httpd-2.4.51-r1894152.patch
 
 # Security fixes
 
@@ -293,6 +295,7 @@ interface for storing and accessing per-user session data.
 %patch30 -p1 -b .cachehardmax
 %{?with_systemd:%patch34 -p1 -b .socketactivation}
 %patch41 -p1 -b .r1861793+
+%patch65 -p1 -b .r1894152
 
 # Patch in the vendor string
 sed -i '/^#define PLATFORM/s/Unix/%{vstring}/' os/unix/os.h
@@ -824,9 +827,17 @@ exit $rv
 
 
 %changelog
+<<<<<<< HEAD
 * Wed Dec 22 2021 Reporter4u <reporter4u@gmail.com> - 2.4.52-1
 - Latest upstream
 
+||||||| bb31d89
+=======
+* Thu Jan 06 2022 Steve Simpson <steven.simpson@parsons.com> - 2.4.52-1
+- Updated to 2.4.52 from Upstream
+- Added patch r1894152 from FC
+
+>>>>>>> 344a934e17361b90a03b142e7b22630c4f72235a
 * Fri Oct 08 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.51-1
 - Latest upstream
 
