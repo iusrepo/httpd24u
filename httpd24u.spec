@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.52
+Version: 2.4.53
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -71,7 +71,7 @@ Patch3: httpd-2.4.1-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
 Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
-Patch19: httpd-2.4.43-detect-systemd.patch
+Patch19: httpd-2.4.53-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.33-export.patch
 Patch24: httpd-2.4.1-corelimit.patch
@@ -827,17 +827,13 @@ exit $rv
 
 
 %changelog
-<<<<<<< HEAD
-* Wed Dec 22 2021 Reporter4u <reporter4u@gmail.com> - 2.4.52-1
-- Latest upstream
+* Mon Mar 14 2022 Reporter4u <reporter4u@gmail.com> - 2.4.53-1
+- Updated to 2.4.53 from Upstream
 
-||||||| bb31d89
-=======
 * Thu Jan 06 2022 Steve Simpson <steven.simpson@parsons.com> - 2.4.52-1
 - Updated to 2.4.52 from Upstream
 - Added patch r1894152 from FC
 
->>>>>>> 344a934e17361b90a03b142e7b22630c4f72235a
 * Fri Oct 08 2021 Steve Simpson <steven.simpson@parsons.com> - 2.4.51-1
 - Latest upstream
 
