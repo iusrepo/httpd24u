@@ -1,11 +1,8 @@
-
-Link straight against .la files.
-
-Upstream-Status: vendor specific
-
---- httpd-2.4.1/configure.in.deplibs
-+++ httpd-2.4.1/configure.in
-@@ -707,9 +707,9 @@ APACHE_HELP_STRING(--with-suexec-umask,u
+diff --git a/configure.in b/configure.in
+index f8f9442..f276550 100644
+--- a/configure.in
++++ b/configure.in
+@@ -786,9 +786,9 @@ APACHE_SUBST(INSTALL_SUEXEC)
  
  dnl APR should go after the other libs, so the right symbols can be picked up
  if test x${apu_found} != xobsolete; then
