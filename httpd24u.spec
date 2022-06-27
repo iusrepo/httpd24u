@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.53
+Version: 2.4.54
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -67,19 +67,19 @@ Source53: httpd.logrotate-legacy
 # build/scripts patches
 Patch1: httpd-2.4.1-apctl.patch
 Patch2: httpd-2.4.43-apxs.patch
-Patch3: httpd-2.4.1-deplibs.patch
+Patch3: httpd-2.4.43-deplibs.patch
 Patch6: httpd-2.4.3-apctl-systemd.patch
-Patch8: httpd-2.4.35-layout-legacy.patch
+#Patch8: httpd-2.4.35-layout-legacy.patch
 # Needed for socket activation and mod_systemd patch
 Patch19: httpd-2.4.53-detect-systemd.patch
 # Features/functional changes
-Patch23: httpd-2.4.33-export.patch
-Patch24: httpd-2.4.1-corelimit.patch
+Patch23: httpd-2.4.53-export.patch
+Patch24: httpd-2.4.43-corelimit.patch
 Patch25: httpd-2.4.43-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
-Patch27: httpd-2.4.2-icons.patch
-Patch30: httpd-2.4.4-cachehardmax.patch
-Patch34: httpd-2.4.17-socket-activation.patch
+Patch27: httpd-2.4.53-icons.patch
+Patch30: httpd-2.4.43-cachehardmax.patch
+Patch34: httpd-2.4.43-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
 	
 Patch65: httpd-2.4.51-r1894152.patch
@@ -827,6 +827,9 @@ exit $rv
 
 
 %changelog
+* Thu Jun 09 2022 Reporter4u <reporter4u@gmail.com> - 2.4.54-1
+- Latest upstream
+
 * Mon Mar 14 2022 Reporter4u <reporter4u@gmail.com> - 2.4.53-1
 - Updated to 2.4.53 from Upstream
 

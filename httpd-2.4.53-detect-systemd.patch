@@ -1,5 +1,5 @@
 diff --git a/Makefile.in b/Makefile.in
-index 0b088ac..9eeb5c7 100644
+index a2e9c82..bd8045c 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -4,7 +4,7 @@ CLEAN_SUBDIRS = test
@@ -12,10 +12,10 @@ index 0b088ac..9eeb5c7 100644
  PROGRAM_DEPENDENCIES = \
    server/libmain.la \
 diff --git a/acinclude.m4 b/acinclude.m4
-index 2a7e5d1..eb28321 100644
+index 97484c9..05abe18 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
-@@ -624,6 +624,7 @@ case $host in
+@@ -631,6 +631,7 @@ case $host in
        if test "${ac_cv_header_systemd_sd_daemon_h}" = "no" || test -z "${SYSTEMD_LIBS}"; then
          AC_MSG_WARN([Your system does not support systemd.])
        else
@@ -23,9 +23,11 @@ index 2a7e5d1..eb28321 100644
          AC_DEFINE(HAVE_SYSTEMD, 1, [Define if systemd is supported])
        fi
     fi
---- a/configure.in	2022-02-24 23:18:42.000000000 +0100
-+++ b/configure.in	2022-03-15 09:22:30.660247473 +0100
-@@ -239,6 +239,7 @@
+diff --git a/configure.in b/configure.in
+index cf437fe..521fc45 100644
+--- a/configure.in
++++ b/configure.in
+@@ -239,6 +239,7 @@ if test "x$PCRE_CONFIG" != "x"; then
    AC_MSG_NOTICE([Using external PCRE library from $PCRE_CONFIG])
    APR_ADDTO(PCRE_INCLUDES, [`$PCRE_CONFIG --cflags`])
    APR_ADDTO(PCRE_LIBS, [`$PCRE_CONFIG --libs8 2>/dev/null || $PCRE_CONFIG --libs`])
@@ -33,7 +35,7 @@ index 2a7e5d1..eb28321 100644
  else
    AC_MSG_ERROR([pcre(2)-config for libpcre not found. PCRE is required and available from http://pcre.org/])
  fi
-@@ -703,6 +704,7 @@
+@@ -734,6 +735,7 @@ APACHE_SUBST(OS_DIR)
  APACHE_SUBST(BUILTIN_LIBS)
  APACHE_SUBST(SHLIBPATH_VAR)
  APACHE_SUBST(OS_SPECIFIC_VARS)
@@ -41,4 +43,3 @@ index 2a7e5d1..eb28321 100644
  
  PRE_SHARED_CMDS='echo ""'
  POST_SHARED_CMDS='echo ""'
-
