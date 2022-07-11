@@ -28,14 +28,13 @@ index 51b02ed..93a2b87 100644
  AddIcon /icons/back.gif ..
  AddIcon /icons/hand.right.gif README
 diff --git a/docs/conf/magic b/docs/conf/magic
-index bc891d9..6402b59 100644
+index bc891d9..9a41b44 100644
 --- a/docs/conf/magic
 +++ b/docs/conf/magic
-@@ -383,3 +383,16 @@
+@@ -383,3 +383,15 @@
  4   string      moov        video/quicktime
  4   string      mdat        video/quicktime
  
-+AddIconByType /icons/bomb.gif application/x-coredump
 +
 +#------------------------------------------------------------------------------
 +# application/x-coredump for LE/BE ELF
