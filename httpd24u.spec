@@ -25,7 +25,7 @@
 Summary: Apache HTTP Server
 Name: httpd24u
 Version: 2.4.54
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -75,9 +75,9 @@ Patch19: httpd-2.4.53-detect-systemd.patch
 # Features/functional changes
 Patch23: httpd-2.4.53-export.patch
 Patch24: httpd-2.4.43-corelimit.patch
-Patch25: httpd-2.4.43-selinux.patch
+Patch25: httpd-2.4.54-selinux.patch
 Patch26: httpd-2.4.43-gettid.patch
-Patch27: httpd-2.4.53-icons.patch
+Patch27: httpd-2.4.54-icons.patch
 Patch30: httpd-2.4.43-cachehardmax.patch
 Patch34: httpd-2.4.43-socket-activation.patch
 Patch41: httpd-2.4.43-r1861793+.patch
@@ -827,6 +827,10 @@ exit $rv
 
 
 %changelog
+* Mon Jul 11 2022 Reporter4u <reporter4u@gmail.com> - 2.4.54-2
+- Update patch httpd-2.4.54-icons.patch from FC
+- Update patch httpd-2.4.54-selinux.patch from FC
+
 * Thu Jun 09 2022 Reporter4u <reporter4u@gmail.com> - 2.4.54-1
 - Latest upstream
 
