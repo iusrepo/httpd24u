@@ -24,8 +24,8 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.54
-Release: 2%{?dist}
+Version: 2.4.55
+Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
 Source2: httpd.logrotate
@@ -827,6 +827,10 @@ exit $rv
 
 
 %changelog
+* Tue Jan 17 2023 Jeff Sheltren <jeff@tag1consulting.com> - 2.4.55-1
+- Update to upstream 2.4.55
+- Fixes CVE-2022-37436, CVE-2022-36760, CVE-2006-20001
+
 * Mon Jul 11 2022 Reporter4u <reporter4u@gmail.com> - 2.4.54-2
 - Update patch httpd-2.4.54-icons.patch from FC
 - Update patch httpd-2.4.54-selinux.patch from FC
