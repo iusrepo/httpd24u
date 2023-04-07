@@ -827,7 +827,7 @@ exit $rv
 
 
 %changelog
-* Thu Mar 09 2023 Reporter4u <reporter4u@gmail.com> - 2.4.57-1
+* Fri Apr 07 2023 Reporter4u <reporter4u@gmail.com> - 2.4.57-1
 - Update to upstream 2.4.57 (Bugfix and improvements)
 
 * Thu Mar 09 2023 Reporter4u <reporter4u@gmail.com> - 2.4.56-1
