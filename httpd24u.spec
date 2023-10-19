@@ -24,7 +24,7 @@
 
 Summary: Apache HTTP Server
 Name: httpd24u
-Version: 2.4.57
+Version: 2.4.58
 Release: 1%{?dist}
 URL: https://httpd.apache.org/
 Source0: https://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
@@ -827,6 +827,10 @@ exit $rv
 
 
 %changelog
+* Thu Oct 19 2023 Reporter4u <reporter4u@gmail.com> - 2.4.58-1
+- Update to upstream 2.4.58 (Bugfix and improvements)
+- Fixes CVE-2023-45802, CVE-2023-43622, CVE-2023-31122
+
 * Fri Apr 07 2023 Reporter4u <reporter4u@gmail.com> - 2.4.57-1
 - Update to upstream 2.4.57 (Bugfix and improvements)
 
